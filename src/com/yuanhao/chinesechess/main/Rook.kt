@@ -2,6 +2,7 @@ package com.yuanhao.chinesechess.main
 
 import com.yuanhao.chinesechess.exceptions.CommanderConflictException
 import com.yuanhao.chinesechess.settings.Settings
+import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import java.awt.Point
 import java.util.ArrayList
 
@@ -35,13 +36,13 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
      */
     private fun checkRookBan(target: Point): Boolean {
         for (man in game.getSameColorChesses(color)) {
-            if (checkBetweenXY(man.location, location, target)) {
+            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
                 return true
             }
         }
 
         for (man in game.getDifferentColorChesses(color)) {
-            if (checkBetweenXY(man.location, location, target)) {
+            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
                 return true
             }
         }

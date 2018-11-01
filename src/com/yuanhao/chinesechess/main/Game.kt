@@ -1,6 +1,7 @@
 package com.yuanhao.chinesechess.main
 
 import com.yuanhao.chinesechess.settings.Settings
+import com.yuanhao.chinesechess.utilities.common.LocationUtility
 
 import java.io.Serializable
 import java.util.ArrayList
@@ -86,14 +87,14 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
 
         for (man in redAliveChesses) {
             if (man !is King) {
-                if (ChessMan.checkBetweenY(man.location, r.location, b.location)) {
+                if (LocationUtility.checkBetweenY(man.location, r.location, b.location)) {
                     return false
                 }
             }
         }
         for (man in blackAliveChesses) {
             if (man !is King) {
-                if (ChessMan.checkBetweenY(man.location, r.location, b.location)) {
+                if (LocationUtility.checkBetweenY(man.location, r.location, b.location)) {
                     return false
                 }
             }

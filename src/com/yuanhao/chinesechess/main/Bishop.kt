@@ -1,6 +1,7 @@
 package com.yuanhao.chinesechess.main
 
 import com.yuanhao.chinesechess.exceptions.CommanderConflictException
+import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import java.awt.Point
 import java.util.ArrayList
 
@@ -40,13 +41,13 @@ class Bishop internal constructor(g: Game, c: ChessColor, private val left: Bool
      */
     private fun checkBishopMidChess(target: Point): Boolean {
         for (man in game.getSameColorChesses(color)) {
-            if (checkBetween2D(man.location, location, target)) {
+            if (LocationUtility.checkBetween2D(man.location, location, target)) {
                 return true
             }
         }
 
         for (man in game.getDifferentColorChesses(color)) {
-            if (checkBetween2D(man.location, location, target)) {
+            if (LocationUtility.checkBetween2D(man.location, location, target)) {
                 return true
             }
         }

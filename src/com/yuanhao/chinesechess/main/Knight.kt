@@ -1,6 +1,7 @@
 package com.yuanhao.chinesechess.main
 
 import com.yuanhao.chinesechess.exceptions.CommanderConflictException
+import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import java.awt.Point
 import java.util.ArrayList
 
@@ -30,13 +31,13 @@ class Knight internal constructor(g: Game, c: ChessColor, private val left: Bool
      */
     private fun checkKnightBan(target: Point): Boolean {
         for (man in game.getSameColorChesses(color)) {
-            if (checkBetweenT2O1(man.location, location, target)) {
+            if (LocationUtility.checkBetweenT2O1(man.location, location, target)) {
                 return true
             }
         }
 
         for (man in game.getDifferentColorChesses(color)) {
-            if (checkBetweenT2O1(man.location, location, target)) {
+            if (LocationUtility.checkBetweenT2O1(man.location, location, target)) {
                 return true
             }
         }
