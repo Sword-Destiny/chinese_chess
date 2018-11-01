@@ -25,20 +25,20 @@ class Queen internal constructor(g: Game, c: ChessColor, private val left: Boole
         if (!super.canGo(x, y)) {
             return false
         }
-        if (location.x != 4) {
-            return if (color === ChessColor.red) {
-                // 4,1
-                x == 4 && y == 1
-            } else {
-                // 4,7
-                x == 4 && y == 7
+        if (x < 3 || y < 0 || x > 5 || y > 2) {
+            if (color == ChessColor.red) {
+                return false
             }
-        } else {
-            val move = arrayOf(intArrayOf(1, 1), intArrayOf(1, -1), intArrayOf(-1, 1), intArrayOf(-1, -1))
-            for (m in move) {
-                if (x == location.x + m[0] && y == location.y + m[1]) {
-                    return true
-                }
+        }
+        if (x < 3 || y < 7 || x > 5 || y > 9) {
+            if (color == ChessColor.black) {
+                return false
+            }
+        }
+        val move = arrayOf(intArrayOf(1, 1), intArrayOf(1, -1), intArrayOf(-1, 1), intArrayOf(-1, -1))
+        for (m in move) {
+            if (x == location.x + m[0] && y == location.y + m[1]) {
+                return true
             }
         }
         return false
@@ -53,33 +53,28 @@ class Queen internal constructor(g: Game, c: ChessColor, private val left: Boole
             }
         } else {
             if (left) {
-                setLocation(3, 8)
+                setLocation(3, 9)
             } else {
-                setLocation(5, 8)
+                setLocation(5, 9)
             }
         }
     }
 
     override fun listAllLocationsCanGo(): ArrayList<Point> {
         val points = ArrayList<Point>()
-        if (location.x != 4) {
-            if (color === ChessColor.red) {
-                // 4,1
-                if (!checkSameColorChessExists(4, 1)) {
-                    points.add(Point(4, 1))
+        val move = arrayOf(intArrayOf(1, 1), intArrayOf(1, -1), intArrayOf(-1, 1), intArrayOf(-1, -1))
+        for (m in move) {
+            val p = Point(location.x + m[0], location.y + m[1])
+            if (checkInBoard(p.x, p.y) && !checkSameColorChessExists(p.x, p.y)) {
+                if (p.x < 3 || p.y < 0 || p.x > 5 || p.y > 2) {
+                    if (color == ChessColor.red) {
+                        points.add(p)
+                    }
                 }
-            } else {
-                // 4,7
-                if (!checkSameColorChessExists(4, 7)) {
-                    points.add(Point(4, 7))
-                }
-            }
-        } else {
-            val move = arrayOf(intArrayOf(1, 1), intArrayOf(1, -1), intArrayOf(-1, 1), intArrayOf(-1, -1))
-            for (m in move) {
-                val p = Point(location.x + m[0], location.y + m[1])
-                if (!checkSameColorChessExists(p.x, p.y)) {
-                    points.add(p)
+                if (p.x < 3 || p.y < 7 || p.x > 5 || p.y > 9) {
+                    if (color == ChessColor.black) {
+                        points.add(p)
+                    }
                 }
             }
         }

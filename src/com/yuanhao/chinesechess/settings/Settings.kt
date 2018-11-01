@@ -36,7 +36,7 @@ class Settings : Serializable {
 
     companion object {
         const val MAX_X = 8
-        const val MAX_Y = 8
+        const val MAX_Y = 9
         const val MIN_X = 0
         const val MIN_Y = 0
     }
