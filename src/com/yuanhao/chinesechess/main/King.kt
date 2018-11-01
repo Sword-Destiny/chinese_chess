@@ -9,7 +9,7 @@ import java.util.ArrayList
 /**
  * 将，帅
  */
-class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c) {
+class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c == ChessColor.red) "帅" else "将") {
 
     override fun canGo(x: Int, y: Int): Boolean {
         if (!super.canGo(x, y)) {

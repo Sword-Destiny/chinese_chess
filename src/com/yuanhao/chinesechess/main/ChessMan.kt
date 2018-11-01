@@ -1,6 +1,7 @@
 package com.yuanhao.chinesechess.main
 
 import com.yuanhao.chinesechess.settings.Settings
+import com.yuanhao.chinesechess.utilities.recoder.Step
 
 import java.awt.*
 import java.io.Serializable
@@ -9,7 +10,7 @@ import java.util.ArrayList
 /**
  * 棋子
  */
-abstract class ChessMan internal constructor(val game: Game, val color: ChessColor/*红，黑*/) : Serializable {
+abstract class ChessMan internal constructor(val game: Game, val color: ChessColor/*红，黑*/, val name: String) : Serializable {
     private var isAlive: Boolean = false
     private var isSelected: Boolean = false //棋子是否被选中
     val location: Point//棋子位置
@@ -78,6 +79,8 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
                 break
             }
         }
+        val s = Step(Point(location.x, location.y), Point(x, y), name)
+        game.recode(s)
         setLocation(x, y)
     }
 

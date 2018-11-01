@@ -14,5 +14,6 @@ class MainFrame : JFrame() {
         setLocation(200, 100)
         setSize(1200, 800)
         game.initGame()
+        game.startGame()
     }
 }

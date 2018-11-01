@@ -6,7 +6,7 @@ import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import java.awt.Point
 import java.util.ArrayList
 
-class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c) {
+class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "车") {
 
     override fun canGo(x: Int, y: Int): Boolean {
         if (!super.canGo(x, y)) {

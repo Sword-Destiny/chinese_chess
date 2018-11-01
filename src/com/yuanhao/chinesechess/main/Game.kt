@@ -2,6 +2,8 @@ package com.yuanhao.chinesechess.main
 
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
+import com.yuanhao.chinesechess.utilities.recoder.Recorder
+import com.yuanhao.chinesechess.utilities.recoder.Step
 
 import java.io.Serializable
 import java.util.ArrayList
@@ -35,6 +37,8 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     private val rrr = Rook(this, ChessColor.red, false)//红车右
     private val rbl = Rook(this, ChessColor.black, true)//黑车左
     private val rbr = Rook(this, ChessColor.black, false)//黑车右
+
+    private val recoder = Recorder()
 
     init {
 
@@ -101,6 +105,14 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         }
 
         return true
+    }
+
+    fun recode(s: Step) {
+        recoder.steps.add(s);
+    }
+
+    fun startGame() {
+        recoder.steps.clear()
     }
 
     fun initGame() {

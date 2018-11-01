@@ -8,7 +8,7 @@ import java.util.ArrayList
 /**
  * 马
  */
-class Knight internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c) {
+class Knight internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "马") {
 
     override fun canGo(x: Int, y: Int): Boolean {
         if (!super.canGo(x, y)) {

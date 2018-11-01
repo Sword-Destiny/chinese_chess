@@ -8,7 +8,7 @@ import java.util.ArrayList
 /**
  * 士
  */
-class Queen internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c) {
+class Queen internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "士") {
 
     @Throws(Exception::class)
     override fun moveTo(x: Int, y: Int) {

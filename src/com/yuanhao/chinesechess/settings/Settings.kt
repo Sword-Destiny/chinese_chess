@@ -9,12 +9,12 @@ import java.util.ArrayList
  * 设置
  */
 class Settings : Serializable {
-    private val userColor: UserColor//用户执红或者执黑
-    private val firstStep: FirstStep//用户先手还是电脑先手
-    private val redDeficiency: ArrayList<ChessMan>//红方让子
-    private val blackDeficiency: ArrayList<ChessMan>//黑方让子
-    private val totalTimeSecond: Long//总时长
-    private val stepTimeSecond: Int//每一步时长
+    private var userColor: UserColor//用户执红或者执黑
+    private var firstStep: FirstStep//用户先手还是电脑先手
+    private var redDeficiency: ArrayList<ChessMan>//红方让子
+    private var blackDeficiency: ArrayList<ChessMan>//黑方让子
+    private var totalTimeSecond: Long//总时长
+    private var stepTimeSecond: Int//每一步时长
 
     constructor() {
         userColor = UserColor.RED
