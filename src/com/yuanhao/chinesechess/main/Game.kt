@@ -37,8 +37,18 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     private val rrr = Rook(this, ChessColor.red, false)//红车右
     private val rbl = Rook(this, ChessColor.black, true)//黑车左
     private val rbr = Rook(this, ChessColor.black, false)//黑车右
+    private val pr0 = Pawn(this, ChessColor.red, 0)//红兵0
+    private val pr1 = Pawn(this, ChessColor.red, 1)//红兵1
+    private val pr2 = Pawn(this, ChessColor.red, 2)//红兵2
+    private val pr3 = Pawn(this, ChessColor.red, 3)//红兵3
+    private val pr4 = Pawn(this, ChessColor.red, 4)//红兵4
+    private val pb0 = Pawn(this, ChessColor.black, 0)//黑卒0
+    private val pb1 = Pawn(this, ChessColor.black, 1)//黑卒1
+    private val pb2 = Pawn(this, ChessColor.black, 2)//黑卒2
+    private val pb3 = Pawn(this, ChessColor.black, 3)//黑卒3
+    private val pb4 = Pawn(this, ChessColor.black, 4)//黑卒4
 
-    private val recoder = Recorder()
+    private val recorder = Recorder()
 
     init {
 
@@ -65,6 +75,17 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         redAliveChesses.add(rrr)
         blackAliveChesses.add(rbl)
         blackAliveChesses.add(rbr)
+
+        redAliveChesses.add(pr0)
+        redAliveChesses.add(pr1)
+        redAliveChesses.add(pr2)
+        redAliveChesses.add(pr3)
+        redAliveChesses.add(pr4)
+        blackAliveChesses.add(pb0)
+        blackAliveChesses.add(pb1)
+        blackAliveChesses.add(pb2)
+        blackAliveChesses.add(pb3)
+        blackAliveChesses.add(pb4)
     }
 
     fun checkCommanderConflict(): Boolean {
@@ -108,11 +129,11 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     }
 
     fun recode(s: Step) {
-        recoder.steps.add(s);
+        recorder.steps.add(s)
     }
 
     fun startGame() {
-        recoder.steps.clear()
+        recorder.steps.clear()
     }
 
     fun initGame() {
