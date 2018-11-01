@@ -30,6 +30,10 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     private val krr = Knight(this, ChessColor.red, false)//红马右
     private val kbl = Knight(this, ChessColor.black, true)//黑马左
     private val kbr = Knight(this, ChessColor.black, false)//黑马右
+    private val rrl = Rook(this, ChessColor.red, true)//红车左
+    private val rrr = Rook(this, ChessColor.red, false)//红车右
+    private val rbl = Rook(this, ChessColor.black, true)//黑车左
+    private val rbr = Rook(this, ChessColor.black, false)//黑车右
 
     init {
 
@@ -51,6 +55,11 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         redAliveChesses.add(krr)
         blackAliveChesses.add(kbl)
         blackAliveChesses.add(kbr)
+
+        redAliveChesses.add(rrl)
+        redAliveChesses.add(rrr)
+        blackAliveChesses.add(rbl)
+        blackAliveChesses.add(rbr)
     }
 
     fun checkCommanderConflict(): Boolean {
