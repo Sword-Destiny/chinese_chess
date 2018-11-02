@@ -2,6 +2,7 @@ package com.yuanhao.chinesechess.gui
 
 import com.yuanhao.chinesechess.main.Game
 import com.yuanhao.chinesechess.settings.Settings
+import com.yuanhao.chinesechess.utilities.common.ArrayUtility
 import javax.swing.*
 
 class MainFrame : JFrame() {
@@ -13,7 +14,6 @@ class MainFrame : JFrame() {
         isResizable = false
         setLocation(200, 100)
         setSize(1200, 800)
-        game.initGame()
         game.startGame()
     }
 }

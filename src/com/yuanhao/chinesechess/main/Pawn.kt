@@ -9,6 +9,12 @@ import java.util.ArrayList
  */
 class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, "车") {
 
+    override fun matrixNumber(): Int =
+            if (color == ChessColor.red)
+                71 + index * 2
+            else
+                70 + index * 2
+
     override fun canGo(x: Int, y: Int): Boolean {
         if (!super.canGo(x, y)) {
             return false

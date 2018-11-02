@@ -2,17 +2,16 @@ package com.yuanhao.chinesechess.main
 
 import com.yuanhao.chinesechess.exceptions.CommanderConflictException
 import com.yuanhao.chinesechess.settings.Settings
-import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import java.awt.Point
 import java.util.ArrayList
 
-class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "车") {
+class Cannon internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "炮") {
 
     override fun matrixNumber(): Int =
             if (color == ChessColor.red)
-                if (left) 51 else 53
+                if (left) 61 else 63
             else
-                if (left) 52 else 54
+                if (left) 62 else 64
 
     override fun canGo(x: Int, y: Int): Boolean {
         if (!super.canGo(x, y)) {
@@ -29,7 +28,7 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
         }
         for (m in move) {
             if (m.x == x && m.y == y) {
-                if (!checkRookBan(m)) {
+                if (!checkCannonBan(m)) {
                     return true
                 }
             }
@@ -38,19 +37,14 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
     }
 
     /**
-     * 检查车中间有没有棋子,能不能走
+     * 检查炮能不能走
      */
-    private fun checkRookBan(target: Point): Boolean {
-        for (man in game.getSameColorChesses(color)) {
-            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
-                return true
-            }
+    private fun checkCannonBan(target: Point): Boolean {
+        if (!checkDifferentColorChessExists(target.x, target.y) && 0 == countMidChessNum(target)) {
+            return true
         }
-
-        for (man in game.getDifferentColorChesses(color)) {
-            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
-                return true
-            }
+        if (checkDifferentColorChessExists(target.x, target.y) && 1 == countMidChessNum(target)) {
+            return true
         }
         return false
     }
@@ -69,15 +63,15 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
     override fun setInitialLocation() {
         if (color === ChessColor.red) {
             if (left) {
-                setLocation(0, 0)
+                setLocation(1, 2)
             } else {
-                setLocation(8, 0)
+                setLocation(7, 2)
             }
         } else {
             if (left) {
-                setLocation(0, 9)
+                setLocation(1, 7)
             } else {
-                setLocation(8, 9)
+                setLocation(7, 7)
             }
         }
     }
@@ -95,7 +89,7 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
         }
         for (m in move) {
             if (checkInBoard(m.x, m.y) && !checkSameColorChessExists(m.x, m.y)) {
-                if (!checkRookBan(m)) {
+                if (!checkCannonBan(m)) {
                     points.add(m)
                 }
             }

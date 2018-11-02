@@ -10,6 +10,12 @@ import java.util.ArrayList
  */
 class Queen internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "士") {
 
+    override fun matrixNumber(): Int =
+            if (color == ChessColor.red)
+                if (left) 21 else 23
+            else
+                if (left) 22 else 24
+
     @Throws(Exception::class)
     override fun moveTo(x: Int, y: Int) {
         if (!canGo(x, y)) {

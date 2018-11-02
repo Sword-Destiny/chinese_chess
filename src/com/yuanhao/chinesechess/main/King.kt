@@ -11,6 +11,8 @@ import java.util.ArrayList
  */
 class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c == ChessColor.red) "帅" else "将") {
 
+    override fun matrixNumber(): Int = if (color == ChessColor.red) 11 else 12
+
     override fun canGo(x: Int, y: Int): Boolean {
         if (!super.canGo(x, y)) {
             // 棋盘外位置

@@ -1,6 +1,7 @@
 package com.yuanhao.chinesechess.main
 
 import com.yuanhao.chinesechess.settings.Settings
+import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import com.yuanhao.chinesechess.utilities.recoder.Step
 
 import java.awt.*
@@ -18,7 +19,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     init {
         isAlive = true
         isSelected = false
-        location = Point()
+        location = Point(0, 0)
     }
 
     internal fun setLocation(x: Int, y: Int) {
@@ -47,7 +48,20 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
      */
     internal fun checkSameColorChessExists(x: Int, y: Int): Boolean {
         for (man in game.getSameColorChesses(color)) {
-            if (man.location.getX() == x.toDouble() && man.location.y == y) {
+            if (man.location.x == x && man.location.y == y) {
+                // 此位置上已有己方棋子
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
+     * 检查某个位置是否有己方棋子
+     */
+    internal fun checkDifferentColorChessExists(x: Int, y: Int): Boolean {
+        for (man in game.getDifferentColorChesses(color)) {
+            if (man.location.x == x && man.location.y == y) {
                 // 此位置上已有己方棋子
                 return true
             }
@@ -68,6 +82,26 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     }
 
     /**
+     * 计算中间棋子的数量
+     */
+    internal fun countMidChessNum(target: Point): Int {
+        var res = 0
+        for (man in game.getSameColorChesses(color)) {
+            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
+                res++
+            }
+        }
+
+        for (man in game.getDifferentColorChesses(color)) {
+            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
+                res++
+            }
+        }
+
+        return res
+    }
+
+    /**
      * 移动到某个新位置,执行这个函数前需要做一系列的检查，比如canGo检查，将帅冲突检查等
      * 子类的实现应该在最后调用父类函数
      */
@@ -84,12 +118,20 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         setLocation(x, y)
     }
 
+    /**
+     * 设置初始位置
+     */
     internal abstract fun setInitialLocation()
 
     /**
      * 列出下一步能走的所有位置
      */
-    abstract fun listAllLocationsCanGo(): ArrayList<Point>
+    internal abstract fun listAllLocationsCanGo(): ArrayList<Point>
+
+    /**
+     * 返回一个独一无二的整数,用于矩阵运算
+     */
+    internal abstract fun matrixNumber(): Int
 
     /**
      * 棋子被吃掉

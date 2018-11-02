@@ -37,6 +37,10 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     private val rrr = Rook(this, ChessColor.red, false)//红车右
     private val rbl = Rook(this, ChessColor.black, true)//黑车左
     private val rbr = Rook(this, ChessColor.black, false)//黑车右
+    private val crl = Cannon(this, ChessColor.red, true)//红炮左
+    private val crr = Cannon(this, ChessColor.red, false)//红炮右
+    private val cbl = Cannon(this, ChessColor.black, true)//黑炮左
+    private val cbr = Cannon(this, ChessColor.black, false)//黑炮右
     private val pr0 = Pawn(this, ChessColor.red, 0)//红兵0
     private val pr1 = Pawn(this, ChessColor.red, 1)//红兵1
     private val pr2 = Pawn(this, ChessColor.red, 2)//红兵2
@@ -48,10 +52,9 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     private val pb3 = Pawn(this, ChessColor.black, 3)//黑卒3
     private val pb4 = Pawn(this, ChessColor.black, 4)//黑卒4
 
-    private val recorder = Recorder()
+    val recorder: Recorder
 
     init {
-
         redAliveChesses.add(kr)
         blackAliveChesses.add(kb)
 
@@ -76,6 +79,11 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         blackAliveChesses.add(rbl)
         blackAliveChesses.add(rbr)
 
+        redAliveChesses.add(crl)
+        redAliveChesses.add(crr)
+        blackAliveChesses.add(cbl)
+        blackAliveChesses.add(cbr)
+
         redAliveChesses.add(pr0)
         redAliveChesses.add(pr1)
         redAliveChesses.add(pr2)
@@ -86,8 +94,15 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         blackAliveChesses.add(pb2)
         blackAliveChesses.add(pb3)
         blackAliveChesses.add(pb4)
+
+        initGame()
+
+        recorder = Recorder(numberMatrix())
     }
 
+    /**
+     * 检查将帅冲突
+     */
     fun checkCommanderConflict(): Boolean {
         var r: King? = null
         for (man in redAliveChesses) {
@@ -128,14 +143,23 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         return true
     }
 
+    /**
+     * 记录操作
+     */
     fun recode(s: Step) {
         recorder.steps.add(s)
     }
 
+    /**
+     * 开始游戏
+     */
     fun startGame() {
         recorder.steps.clear()
     }
 
+    /**
+     * 初始化游戏
+     */
     fun initGame() {
         for (man in redAliveChesses) {
             man.setInitialLocation()
@@ -143,6 +167,20 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         for (man in blackAliveChesses) {
             man.setInitialLocation()
         }
+    }
+
+    /**
+     * 返回一个用于分析的数字矩阵
+     */
+    private fun numberMatrix(): Array<Array<Int>> {
+        val m = Array(9) { Array(10) { 0 } }
+        for (man in redAliveChesses) {
+            m[man.location.x][man.location.y] = man.matrixNumber()
+        }
+        for (man in blackAliveChesses) {
+            m[man.location.x][man.location.y] = man.matrixNumber()
+        }
+        return m
     }
 
     /**

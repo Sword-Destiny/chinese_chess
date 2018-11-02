@@ -10,6 +10,12 @@ import java.util.ArrayList
  */
 class Bishop internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, if (c == ChessColor.red) "相" else "象") {
 
+    override fun matrixNumber(): Int =
+            if (color == ChessColor.red)
+                if (left) 31 else 33
+            else
+                if (left) 32 else 34
+
     override fun canGo(x: Int, y: Int): Boolean {
         if (!super.canGo(x, y)) {
             return false
