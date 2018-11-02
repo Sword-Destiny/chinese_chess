@@ -9,9 +9,9 @@ import java.util.ArrayList
 /**
  * 将，帅
  */
-class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c == ChessColor.red) "帅" else "将") {
+class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c == ChessColor.RED) "帅" else "将") {
 
-    override fun matrixNumber(): Int = if (color == ChessColor.red) 11 else 12
+    override fun matrixNumber(): Int = if (color == ChessColor.RED) 11 else 12
 
     override fun canGo(x: Int, y: Int): Boolean {
         if (!super.canGo(x, y)) {
@@ -19,12 +19,12 @@ class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c =
             return false
         }
         if (x < 3 || y < 0 || x > 5 || y > 2) {
-            if (color == ChessColor.red) {
+            if (color == ChessColor.RED) {
                 return false
             }
         }
         if (x < 3 || y < 7 || x > 5 || y > 9) {
-            if (color == ChessColor.black) {
+            if (color == ChessColor.BLACK) {
                 return false
             }
         }
@@ -45,12 +45,12 @@ class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c =
             val p = Point(location.x + m[0], location.y + m[1])
             if (checkInBoard(p.x, p.y) && !checkSameColorChessExists(p.x, p.y)) {
                 if (p.x < 3 || p.y < 0 || p.x > 5 || p.y > 2) {
-                    if (color == ChessColor.red) {
+                    if (color == ChessColor.RED) {
                         points.add(p)
                     }
                 }
                 if (p.x < 3 || p.y < 7 || p.x > 5 || p.y > 9) {
-                    if (color == ChessColor.black) {
+                    if (color == ChessColor.BLACK) {
                         points.add(p)
                     }
                 }
@@ -60,7 +60,7 @@ class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c =
     }
 
     override fun setInitialLocation() {
-        if (color === ChessColor.red) {
+        if (color === ChessColor.RED) {
             setLocation(4, 0)
         } else {
             setLocation(4, 9)

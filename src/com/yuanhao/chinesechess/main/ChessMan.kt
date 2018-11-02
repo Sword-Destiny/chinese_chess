@@ -113,7 +113,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
                 break
             }
         }
-        val s = Step(Point(location.x, location.y), Point(x, y), name)
+        val s = Step(Point(location.x, location.y), Point(x, y), name, color)
         game.recode(s)
         setLocation(x, y)
     }
@@ -138,7 +138,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
      */
     private fun die() {
         isAlive = false
-        if (color === ChessColor.red) {
+        if (color === ChessColor.RED) {
             game.redAliveChesses.remove(this)
             game.redDeadChesses.add(this)
         } else {

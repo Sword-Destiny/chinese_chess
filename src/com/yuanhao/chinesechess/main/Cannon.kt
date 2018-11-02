@@ -5,10 +5,13 @@ import com.yuanhao.chinesechess.settings.Settings
 import java.awt.Point
 import java.util.ArrayList
 
+/**
+ * 炮
+ */
 class Cannon internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "炮") {
 
     override fun matrixNumber(): Int =
-            if (color == ChessColor.red)
+            if (color == ChessColor.RED)
                 if (left) 61 else 63
             else
                 if (left) 62 else 64
@@ -61,7 +64,7 @@ class Cannon internal constructor(g: Game, c: ChessColor, private val left: Bool
     }
 
     override fun setInitialLocation() {
-        if (color === ChessColor.red) {
+        if (color === ChessColor.RED) {
             if (left) {
                 setLocation(1, 2)
             } else {

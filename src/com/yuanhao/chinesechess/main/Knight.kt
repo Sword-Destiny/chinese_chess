@@ -11,7 +11,7 @@ import java.util.ArrayList
 class Knight internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "马") {
 
     override fun matrixNumber(): Int =
-            if (color == ChessColor.red)
+            if (color == ChessColor.RED)
                 if (left) 41 else 43
             else
                 if (left) 42 else 44
@@ -62,7 +62,7 @@ class Knight internal constructor(g: Game, c: ChessColor, private val left: Bool
     }
 
     override fun setInitialLocation() {
-        if (color === ChessColor.red) {
+        if (color === ChessColor.RED) {
             if (left) {
                 setLocation(1, 0)
             } else {

@@ -10,7 +10,7 @@ import java.util.ArrayList
 class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, "车") {
 
     override fun matrixNumber(): Int =
-            if (color == ChessColor.red)
+            if (color == ChessColor.RED)
                 71 + index * 2
             else
                 70 + index * 2
@@ -20,7 +20,7 @@ class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) 
             return false
         }
         val move =
-                if (color == ChessColor.red)
+                if (color == ChessColor.RED)
                     if (location.y <= 4) arrayOf(arrayOf(0, 1))
                     else arrayOf(arrayOf(0, 1), arrayOf(-1, 0), arrayOf(1, 0))
                 else
@@ -47,7 +47,7 @@ class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) 
     }
 
     override fun setInitialLocation() {
-        if (color === ChessColor.red) {
+        if (color === ChessColor.RED) {
             val x = index * 2
             setLocation(x, 3)
         } else {
@@ -59,7 +59,7 @@ class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) 
     override fun listAllLocationsCanGo(): ArrayList<Point> {
         val points = ArrayList<Point>()
         val move =
-                if (color == ChessColor.red)
+                if (color == ChessColor.RED)
                     if (location.y <= 4) arrayOf(arrayOf(0, 1))
                     else arrayOf(arrayOf(0, 1), arrayOf(-1, 0), arrayOf(1, 0))
                 else

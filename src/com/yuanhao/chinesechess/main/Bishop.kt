@@ -8,10 +8,10 @@ import java.util.ArrayList
 /**
  * 相，象
  */
-class Bishop internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, if (c == ChessColor.red) "相" else "象") {
+class Bishop internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, if (c == ChessColor.RED) "相" else "象") {
 
     override fun matrixNumber(): Int =
-            if (color == ChessColor.red)
+            if (color == ChessColor.RED)
                 if (left) 31 else 33
             else
                 if (left) 32 else 34
@@ -24,7 +24,7 @@ class Bishop internal constructor(g: Game, c: ChessColor, private val left: Bool
         for (m in move) {
             val p = Point(location.x + m[0], location.y + m[1])
             if (p.x == x && p.y == y) {
-                if (color == ChessColor.red) {
+                if (color == ChessColor.RED) {
                     if (p.y <= 4) {
                         if (!checkBishopMidChess(p)) {
                             return true
@@ -72,7 +72,7 @@ class Bishop internal constructor(g: Game, c: ChessColor, private val left: Bool
     }
 
     override fun setInitialLocation() {
-        if (color === ChessColor.red) {
+        if (color === ChessColor.RED) {
             if (left) {
                 setLocation(2, 0)
             } else {
@@ -93,7 +93,7 @@ class Bishop internal constructor(g: Game, c: ChessColor, private val left: Bool
         for (m in move) {
             val p = Point(location.x + m[0], location.y + m[1])
             if (checkInBoard(p.x, p.y) && !checkSameColorChessExists(p.x, p.y)) {
-                if (color == ChessColor.red) {
+                if (color == ChessColor.RED) {
                     if (p.y <= 4) {
                         if (!checkBishopMidChess(p)) {
                             points.add(p)

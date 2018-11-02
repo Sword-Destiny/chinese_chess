@@ -9,7 +9,7 @@ import java.util.ArrayList
 class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "车") {
 
     override fun matrixNumber(): Int =
-            if (color == ChessColor.red)
+            if (color == ChessColor.RED)
                 if (left) 51 else 53
             else
                 if (left) 52 else 54
@@ -67,7 +67,7 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
     }
 
     override fun setInitialLocation() {
-        if (color === ChessColor.red) {
+        if (color === ChessColor.RED) {
             if (left) {
                 setLocation(0, 0)
             } else {
