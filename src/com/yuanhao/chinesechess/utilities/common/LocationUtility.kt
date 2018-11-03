@@ -1,5 +1,9 @@
 package com.yuanhao.chinesechess.utilities.common
 
+import com.yuanhao.chinesechess.gui.MainFrame
+import com.yuanhao.chinesechess.main.ChessColor
+import com.yuanhao.chinesechess.main.Game
+import com.yuanhao.chinesechess.settings.Settings
 import java.awt.Point
 
 class LocationUtility {
@@ -60,6 +64,48 @@ class LocationUtility {
                 }
             }
             return false
+        }
+
+
+        /**
+         * 界面坐标到棋盘坐标
+         */
+        internal fun frameToChessBoard(p: Point, game: Game): Point {
+            val x = p.x - MainFrame.panel_x - MainFrame.half_cell
+            val y = p.y - MainFrame.panel_y - MainFrame.half_cell
+            var px = Math.round((x.toDouble()) / (MainFrame.cell_width_height.toDouble())).toInt()
+            var py = Math.round((y.toDouble()) / (MainFrame.cell_width_height.toDouble())).toInt()
+
+            // 反转y轴
+            py = Settings.MAX_Y - py
+
+            // 棋子位置反转
+            if (game.settings.userColor == ChessColor.BLACK) {
+                px = Settings.MAX_X - px
+                py = Settings.MAX_Y - py
+            }
+            return Point(px, py)
+        }
+
+        /**
+         * 棋盘坐标到界面坐标
+         */
+        internal fun chessBoardToFrame(p: Point, game: Game): Point {
+            var px = p.x
+            var py = p.y
+
+            // 棋子位置反转
+            if (game.settings.userColor == ChessColor.BLACK) {
+                px = Settings.MAX_X - px
+                py = Settings.MAX_Y - py
+            }
+
+            // 反转y轴
+            py = Settings.MAX_Y - py
+
+            val x = px * MainFrame.cell_width_height + MainFrame.half_cell + MainFrame.panel_x
+            val y = py * MainFrame.cell_width_height + MainFrame.half_cell + MainFrame.panel_y
+            return Point(x, y)
         }
     }
 }

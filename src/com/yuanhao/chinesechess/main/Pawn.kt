@@ -7,7 +7,7 @@ import java.util.ArrayList
 /**
  * 兵卒
  */
-class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, "车") {
+class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, if (c == ChessColor.RED) "兵" else "卒") {
 
     override fun matrixNumber(): Int =
             if (color == ChessColor.RED)

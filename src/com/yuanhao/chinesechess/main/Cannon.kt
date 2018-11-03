@@ -44,12 +44,12 @@ class Cannon internal constructor(g: Game, c: ChessColor, private val left: Bool
      */
     private fun checkCannonBan(target: Point): Boolean {
         if (!checkDifferentColorChessExists(target.x, target.y) && 0 == countMidChessNum(target)) {
-            return true
+            return false
         }
         if (checkDifferentColorChessExists(target.x, target.y) && 1 == countMidChessNum(target)) {
-            return true
+            return false
         }
-        return false
+        return true
     }
 
     @Throws(Exception::class)

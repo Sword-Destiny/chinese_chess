@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.main
 
+import com.yuanhao.chinesechess.settings.FirstStep
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import com.yuanhao.chinesechess.utilities.recoder.Recorder
@@ -9,6 +10,7 @@ import java.io.Serializable
 import java.util.ArrayList
 
 /**
+ * TODO 游戏结束检查
  * 游戏
  * 默认红方在下
  */
@@ -52,7 +54,9 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     private val pb3 = Pawn(this, ChessColor.BLACK, 3)//黑卒3
     private val pb4 = Pawn(this, ChessColor.BLACK, 4)//黑卒4
 
-    private val recorder: Recorder
+    internal val recorder: Recorder
+
+    internal var userGo : Boolean
 
     init {
         redAliveChesses.add(kr)
@@ -98,12 +102,14 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         initGame()
 
         recorder = Recorder(numberMatrix())
+
+        userGo = FirstStep.USER == settings.firstStep
     }
 
     /**
      * 检查将帅冲突
      */
-    fun checkCommanderConflict(): Boolean {
+    fun checkCommanderConflict(x: Int, y: Int): Boolean {
         var r: King? = null
         for (man in redAliveChesses) {
             if (man is King) {
@@ -114,6 +120,9 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         if (r == null) {
             return false
         }
+        if (r.location.x == x && r.location.y == y) {
+            return false
+        }
         var b: King? = null
         for (man in blackAliveChesses) {
             if (man is King) {
@@ -122,6 +131,12 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
             }
         }
         if (b == null) {
+            return false
+        }
+        if (b.location.x == x && b.location.y == y) {
+            return false
+        }
+        if (r.location.x != b.location.x) {
             return false
         }
 

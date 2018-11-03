@@ -13,7 +13,7 @@ import java.util.ArrayList
  */
 abstract class ChessMan internal constructor(val game: Game, val color: ChessColor/*红，黑*/, val name: String) : Serializable {
     private var isAlive: Boolean = false
-    private var isSelected: Boolean = false //棋子是否被选中
+    var isSelected: Boolean = false //棋子是否被选中
     val location: Point//棋子位置
 
     init {
@@ -76,7 +76,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     internal fun checkCommanderConflict(x: Int, y: Int): Boolean {
         val p = Point(location.x, location.y)
         setLocation(x, y)
-        val conflict = game.checkCommanderConflict()
+        val conflict = game.checkCommanderConflict(x, y)
         setLocation(p.x, p.y)
         return conflict
     }
@@ -113,7 +113,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
                 break
             }
         }
-        val s = Step(Point(location.x, location.y), Point(x, y), name, color)
+        val s = Step(Point(location.x, location.y), Point(x, y), name, color, game.settings.userColor)
         game.recode(s)
         setLocation(x, y)
     }
@@ -144,6 +144,9 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         } else {
             game.blackAliveChesses.remove(this)
             game.blackDeadChesses.add(this)
+        }
+        if(this is King){
+            // 游戏结束
         }
     }
 
