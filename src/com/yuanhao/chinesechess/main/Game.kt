@@ -5,12 +5,12 @@ import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import com.yuanhao.chinesechess.utilities.recoder.Recorder
 import com.yuanhao.chinesechess.utilities.recoder.Step
+import java.awt.Point
 
 import java.io.Serializable
 import java.util.ArrayList
 
 /**
- * TODO 游戏结束检查
  * 游戏
  * 默认红方在下
  */
@@ -56,7 +56,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
 
     internal val recorder: Recorder
 
-    internal var userGo : Boolean
+    internal var userGo: Boolean
 
     init {
         redAliveChesses.add(kr)
@@ -163,6 +163,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
      */
     fun recode(s: Step) {
         recorder.record(s)
+        println(s.info)
     }
 
     /**
@@ -218,5 +219,46 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         } else {
             blackAliveChesses
         }
+    }
+
+    /**
+     * 检查将帅是否被将军
+     */
+    fun checkKingWillDie(c: ChessColor): Boolean {
+        var king: King? = null
+        for (man in getSameColorChesses(c)) {
+            if (man is King) {
+                king = man
+                break
+            }
+        }
+        if (king == null) {
+            return false
+        }
+        for (man in getDifferentColorChesses(c)) {
+            if (man.canGo(king.location.x, king.location.y)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
+     * 检查游戏是否分出胜负
+     */
+    fun checkGameOver(c: ChessColor): Boolean {
+        for (man in getSameColorChesses(c)) {
+            val locations = man.listAllLocationsCanGo()
+            val loc = Point(man.location.x, man.location.y)
+            for (l in locations) {
+                man.setLocation(l.x, l.y);
+                if (!checkKingWillDie(c) && !checkCommanderConflict(l.x, l.y)) {
+                    man.setLocation(loc.x, loc.y)
+                    return false
+                }
+            }
+            man.setLocation(loc.x, loc.y)
+        }
+        return true
     }
 }

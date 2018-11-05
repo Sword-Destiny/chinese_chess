@@ -9,7 +9,7 @@ import java.io.Serializable
  * uc:用户棋子颜色
  */
 class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessColor) : Serializable {
-    private val info: String
+    val info: String
     val from: Point = f
     val to: Point = t
 

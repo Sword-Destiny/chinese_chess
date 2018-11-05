@@ -75,22 +75,10 @@ class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c =
         if (checkCommanderConflict(x, y)) {
             throw CommanderConflictException("将帅不能照面")
         }
-        if (checkWillDie(x, y)) {
-            throw LocationErrorException("将帅移动到这个位置会被吃掉")
+        if (checkKingWillDie(x, y)) {
+            throw LocationErrorException("移动到这个位置会被吃掉")
         }
         super.moveTo(x, y)
-    }
-
-    /**
-     * 检查移动的新位置是否会死
-     */
-    private fun checkWillDie(x: Int, y: Int): Boolean {
-        for (man in game.getDifferentColorChesses(color)) {
-            if (man.canGo(x, y)) {
-                return true
-            }
-        }
-        return false
     }
 
 }

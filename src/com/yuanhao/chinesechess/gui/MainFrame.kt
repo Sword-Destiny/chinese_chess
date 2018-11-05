@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.gui
 
+import com.yuanhao.chinesechess.exceptions.KingWillDieException
 import com.yuanhao.chinesechess.main.Game
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
@@ -7,13 +8,19 @@ import java.awt.Point
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.lang.Exception
+import java.util.Timer
 import javax.swing.*
+import javax.swing.JDialog
+import java.util.TimerTask
+import javax.swing.JOptionPane
+
 
 class MainFrame : JFrame() {
-    private val game = Game(Settings())
-    private val buttons = ArrayList<ChessButton>()
-    private val back = JPanel()
-    val cont = JPanel()
+    private val game = Game(Settings()) // 游戏
+    private val buttons = ArrayList<ChessButton>() // 所有的棋子按钮
+    private val back = JPanel() // 背景面板
+    val cont = JPanel() // 内容面板
+    private val timer = Timer() // 计时器
 
     companion object {
         const val init_x = 200 // 窗口初始位置
@@ -58,11 +65,14 @@ class MainFrame : JFrame() {
         for (man in game.redAliveChesses) {
             val p = LocationUtility.chessBoardToFrame(man.location, game)
             val btn = ChessButton(man.color, p.x, p.y, cell_width_height - 16, man)
-            chessButtonClicked(btn)
+            buttons.add(btn)
         }
         for (man in game.blackAliveChesses) {
             val p = LocationUtility.chessBoardToFrame(man.location, game)
             val btn = ChessButton(man.color, p.x, p.y, cell_width_height - 16, man)
+            buttons.add(btn)
+        }
+        for (btn in buttons) {
             chessButtonClicked(btn)
         }
 
@@ -71,7 +81,9 @@ class MainFrame : JFrame() {
         cont.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 val p = LocationUtility.frameToChessBoard(e!!.point, game)
-                moveChess(p)
+                if(game.userGo) {
+                    userMoveChess(p)
+                }
                 super.mouseClicked(e)
             }
         })
@@ -83,11 +95,10 @@ class MainFrame : JFrame() {
      */
     private fun chessButtonClicked(btn: ChessButton) {
         val man = btn.chess
-        buttons.add(btn)
         cont.add(btn)
         btn.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
-                if(game.userGo) {
+                if (game.userGo) {
                     if (man.color == game.settings.userColor) {
                         man.isSelected = !man.isSelected
                         for (m in game.getSameColorChesses(man.color)) {
@@ -96,7 +107,7 @@ class MainFrame : JFrame() {
                             }
                         }
                     } else {
-                        if (moveChess(man.location)) {
+                        if (userMoveChess(man.location)) {
                             cont.remove(btn)
                         }
                     }
@@ -110,29 +121,63 @@ class MainFrame : JFrame() {
     }
 
     /**
-     * 移动棋子
+     * 玩家移动棋子
      */
-    fun moveChess(p: Point): Boolean {
+    fun userMoveChess(p: Point): Boolean {
         for (btn in buttons) {
             if (btn.chess.isSelected) {
                 if (btn.chess.canGo(p.x, p.y)) {
-                    try {
+                    return try {
                         btn.chess.moveTo(p.x, p.y)
                         val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
                         btn.move(fp.x, fp.y, cell_width_height - 10)
                         btn.chess.isSelected = false
-                        game.userGo = ! game.userGo
-                        return true
+                        game.userGo = !game.userGo
+                        if (game.checkKingWillDie(game.settings.computerColor)) {
+                            showMessage("将军")
+                        }
+                        if (game.checkGameOver(game.settings.computerColor)) {
+                            showMessage("玩家获胜")
+                        } else {
+                            computerMoveChess()
+                        }
+                        true
                     } catch (e: Exception) {
                         println(e.message)
                         JOptionPane.showMessageDialog(null, e.message, "错误", JOptionPane.ERROR_MESSAGE)
-                        return false
+                        false
                     }
                 }
                 break
             }
         }
         return false
+    }
+
+    /**
+     * 显示一条2秒的信息
+     */
+    private fun showMessage(msg: String) {
+        val op = JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE)
+        val dialog = op.createDialog("提示")
+        dialog.defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
+        dialog.isAlwaysOnTop = true
+        dialog.isModal = false
+        dialog.isVisible = true
+        dialog.setSize(400, 200)
+        dialog.setLocation(this.x + this.width / 2 - dialog.width / 2, this.y + this.height / 2 + dialog.height / 2)
+
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                dialog.isVisible = false
+                dialog.dispose()
+            }
+        }, 2000)
+
+    }
+
+    fun computerMoveChess() {
+
     }
 
 }

@@ -1,6 +1,7 @@
 package com.yuanhao.chinesechess.main
 
 import com.yuanhao.chinesechess.exceptions.CommanderConflictException
+import com.yuanhao.chinesechess.exceptions.KingWillDieException
 import com.yuanhao.chinesechess.settings.Settings
 import java.awt.Point
 import java.util.ArrayList
@@ -59,6 +60,9 @@ class Cannon internal constructor(g: Game, c: ChessColor, private val left: Bool
         }
         if (checkCommanderConflict(x, y)) {
             throw CommanderConflictException("将帅不能照面")
+        }
+        if (checkKingWillDie(x, y)) {
+            throw KingWillDieException((if (color == ChessColor.RED) "帅" else "将") + "会被吃掉")
         }
         super.moveTo(x, y)
     }

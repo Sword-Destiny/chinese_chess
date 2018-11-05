@@ -82,6 +82,17 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     }
 
     /**
+     * 检查己方将帅是否被将军
+     */
+    internal fun checkKingWillDie(x: Int, y: Int): Boolean {
+        val p = Point(location.x, location.y)
+        setLocation(x, y)
+        val willDie = game.checkKingWillDie(color)
+        setLocation(p.x, p.y)
+        return willDie
+    }
+
+    /**
      * 计算中间棋子的数量
      */
     internal fun countMidChessNum(target: Point): Int {
@@ -145,7 +156,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
             game.blackAliveChesses.remove(this)
             game.blackDeadChesses.add(this)
         }
-        if(this is King){
+        if (this is King) {
             // 游戏结束
         }
     }
