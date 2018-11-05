@@ -7,12 +7,10 @@ import java.io.Serializable
  * 记录步骤
  */
 class Recorder(matrix: Array<Array<Int>>) : Serializable {
-    // 走棋记录
-    private val steps = ArrayList<Step>()
-    // 初始棋盘
-    internal val initStatus: Array<Array<Int>>
-    // 最终棋盘或者说当前棋盘
-    internal val finalStatus: Array<Array<Int>>
+
+    private val steps = ArrayList<Step>() // 走棋记录
+    internal val initStatus: Array<Array<Int>> // 初始棋盘
+    internal val finalStatus: Array<Array<Int>> // 最终棋盘或者说当前棋盘
 
     init {
         if (matrix.isNotEmpty()) {

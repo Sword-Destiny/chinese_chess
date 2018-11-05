@@ -15,12 +15,12 @@ import javax.swing.JButton
  */
 class ChessButton(color: ChessColor, x: Int, y: Int, s: Int, man: ChessMan) : JButton(man.name) {
 
-    private var hover = false
-    var cellSize: Int
-    var fontSize: Int
-    val chess = man
-    var lx: Int
-    var ly: Int
+    private var hover = false // 鼠标移动到上面时,略微变大
+    var cellSize: Int // 棋格大小
+    var fontSize: Int // 字体大小
+    val chess = man // 绑定的棋子
+    var lx: Int // 位置
+    var ly: Int // 位置
 
     init {
         text = man.name
@@ -66,6 +66,9 @@ class ChessButton(color: ChessColor, x: Int, y: Int, s: Int, man: ChessMan) : JB
         })
     }
 
+    /**
+     * 移动到新位置
+     */
     fun move(x: Int, y: Int, s: Int) {
         lx = x
         ly = y
@@ -77,6 +80,9 @@ class ChessButton(color: ChessColor, x: Int, y: Int, s: Int, man: ChessMan) : JB
         repaint()
     }
 
+    /**
+     * 绘制按钮,两个圈加一个字,圈是我们画的,字是默认画的
+     */
     override fun paintComponent(g: Graphics?) {
         val h = this.height
         val w = this.width

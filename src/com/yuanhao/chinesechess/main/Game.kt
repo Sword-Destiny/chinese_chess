@@ -58,7 +58,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
 
     internal val recorder: Recorder // 记录器
     internal var status: GameStatus // 当前状态
-    internal var winner: ChessColor? = null // 胜者
+    private var winner: ChessColor? = null // 胜者
     internal var userGo: Boolean // 是否轮到用户走棋
 
     init {
@@ -290,7 +290,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     }
 
     /**
-     * 返回敌方棋子
+     * 返回敌方在(x,y)的棋子,没有则返回null
      */
     fun getDifferentExistsChess(x: Int, y: Int, c: ChessColor): ChessMan? {
         for (man in getDifferentColorChesses(c)) {

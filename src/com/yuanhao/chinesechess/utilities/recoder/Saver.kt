@@ -8,6 +8,9 @@ import java.lang.Exception
 import java.nio.charset.Charset
 import java.util.*
 
+/**
+ * 保存文件工具类
+ */
 class Saver {
 
     companion object {

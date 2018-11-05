@@ -13,16 +13,19 @@ class Settings(uc: ChessColor = ChessColor.RED, cc: ChessColor = ChessColor.BLAC
     val userColor = uc // 用户执红或者执黑
     val computerColor = cc // 电脑颜色
     val firstStep = fs // 用户先手还是电脑先手
+
+    // TODO 以下四个暂时没有使用
     private val redDeficiency = rd // 红方让子
     private val blackDeficiency = bd // 黑方让子
     private val totalTimeSecond = tt // 总时长
     private val stepTimeSecond = st // 每一步时长
 
     companion object {
-        const val MAX_X = 8
-        const val MAX_Y = 9
-        const val MIN_X = 0
-        const val MIN_Y = 0
+        // 棋盘是一个9x10的矩阵,在界面上,横向为x,纵向为y,在矩阵里面,x为行,y为列
+        const val MAX_X = 8 // 最大的x
+        const val MAX_Y = 9 // 最大的y
+        const val MIN_X = 0 // 最小的x
+        const val MIN_Y = 0 // 最小的y
     }
 
     override fun toString(): String {

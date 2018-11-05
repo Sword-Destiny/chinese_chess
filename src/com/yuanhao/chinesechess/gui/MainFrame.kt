@@ -46,7 +46,7 @@ class MainFrame : JFrame() {
         setSize(total_width, total_height)
         layeredPane.layout = null
 
-        // 棋盘背景
+        // 添加棋盘背景
         val board = JLabel(ImageIcon("data/board.jpg"))
         board.setSize(panel_width, panel_height)
         board.setLocation(panel_x, panel_y)
@@ -58,7 +58,7 @@ class MainFrame : JFrame() {
         back.add(board)
         layeredPane.add(back, Int.MIN_VALUE)
 
-        // 棋子
+        // 添加面板和所有的棋子
         cont.isOpaque = false
         cont.layout = null
         cont.setSize(total_width, total_height)
@@ -79,6 +79,9 @@ class MainFrame : JFrame() {
         }
 
         cont.addMouseListener(object : MouseAdapter() {
+            /**
+             * 鼠标点击棋盘面板事件
+             */
             override fun mouseClicked(e: MouseEvent?) {
                 if (game.status != GameStatus.STARTED) {
                     super.mouseClicked(e)

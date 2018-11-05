@@ -17,18 +17,22 @@ class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessCo
     val color = c // 棋子颜色
 
     init {
+        // 用户执黑坐标旋转
         val fy = if (uc == ChessColor.RED) f.y else Settings.MAX_Y - f.y
         val ty = if (uc == ChessColor.RED) t.y else Settings.MAX_Y - t.y
         val fx = if (uc == ChessColor.RED) f.x else Settings.MAX_X - f.x
         val tx = if (uc == ChessColor.RED) t.x else Settings.MAX_X - t.x
+        // 判断动作为进,退或者平
+        // 对于用户,以上为进,下为退
+        // 对于电脑,以下为进,上为退
         val action =
-                if (c == uc) {
+                if (c == uc) { // 棋子颜色等于用户颜色,这是用户走棋
                     when {
                         fy > ty -> "退"
                         fy < ty -> "进"
                         else -> "平"
                     }
-                } else {
+                } else { // 电脑走棋
                     when {
                         fy > ty -> "进"
                         fy < ty -> "退"
@@ -45,6 +49,7 @@ class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessCo
     }
 
     companion object {
+        // 这个是和棋盘对应的,棋盘上用户这边是九到一,电脑那边是1到9
         val user_numbers = arrayOf("九", "八", "七", "六", "五", "四", "三", "二", "一")
         val computer_numbers = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9")
     }

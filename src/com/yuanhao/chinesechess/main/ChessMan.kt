@@ -22,6 +22,9 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         location = Point(0, 0)
     }
 
+    /**
+     * 设置棋子位置
+     */
     internal fun setLocation(x: Int, y: Int) {
         location.setLocation(x, y)
     }
@@ -37,7 +40,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     }
 
     /**
-     * 检查是否在棋盘上
+     * 检查目标位置是否在棋盘上
      */
     internal fun checkInBoard(x: Int, y: Int): Boolean {
         return x >= Settings.MIN_X && y >= Settings.MIN_Y && x <= Settings.MAX_X && y <= Settings.MAX_Y
@@ -70,8 +73,9 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     }
 
     /**
-     * 先假装移动到新位置
+     * 先试探移动到新位置
      * 检查将帅照面
+     * 然后再移动回原位置
      */
     internal fun checkKingConflict(x: Int, y: Int): Boolean {
         val p = Point(location.x, location.y)
@@ -85,8 +89,9 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     }
 
     /**
-     * 先假装移动到新位置
+     * 先试探移动到新位置
      * 检查己方将帅是否被将军
+     * 然后再移动回原位置
      */
     internal fun checkKingWillDie(x: Int, y: Int): Boolean {
         val p = Point(location.x, location.y)
@@ -100,7 +105,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     }
 
     /**
-     * 计算中间棋子的数量
+     * 计算两个棋子中间棋子的数量
      */
     internal fun countMidChessNum(target: Point): Int {
         var res = 0
@@ -120,7 +125,8 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     }
 
     /**
-     * 移动到某个新位置,执行这个函数前需要做一系列的检查，比如canGo检查，将帅冲突检查等
+     * 移动到某个新位置
+     * 执行这个函数前需要做一系列的检查，比如canGo检查，将帅冲突检查等
      * 子类的实现应该在最后调用父类函数
      */
     @Throws(Exception::class)

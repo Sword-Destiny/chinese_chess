@@ -8,11 +8,15 @@ import java.awt.Point
 
 /**
  * 坐标处理工具类
+ * 当用户执黑棋的时候,界面会旋转
+ * 由于Windows窗口的y轴是向下的,所以还涉及到y轴反转
  */
 class LocationUtility {
+
     companion object {
         /**
          * 检测某个棋子是不是在两个棋子中间(横向)
+         * check为待测点
          */
         private fun checkBetweenX(check: Point, p: Point, q: Point): Boolean {
             if (check.y == p.y && check.y == q.y) {
@@ -28,6 +32,7 @@ class LocationUtility {
 
         /**
          * 检测某个棋子是不是在两个棋子中间(纵向)
+         * check为待测点
          */
         internal fun checkBetweenY(check: Point, p: Point, q: Point): Boolean {
             if (check.x == p.x && check.x == q.x) {
@@ -46,7 +51,8 @@ class LocationUtility {
         }
 
         /**
-         * 检查棋子是否在两个棋子中间
+         * 检查棋子是否在两个棋子中间,二维
+         * check为待测点
          */
         internal fun checkBetween2D(check: Point, p: Point, q: Point): Boolean {
             if (check.x < p.x && check.x > q.x || check.x > p.x && check.x < q.x) {
@@ -59,6 +65,7 @@ class LocationUtility {
 
         /**
          * 检测日字，马脚
+         * check为待测点
          */
         internal fun checkBetweenT2O1(check: Point, source: Point, target: Point): Boolean {
             if (Math.abs(check.x - source.x) == 1 && check.y == source.y || Math.abs(check.y - source.y) == 1 && check.x == source.x) {
@@ -82,7 +89,7 @@ class LocationUtility {
             // 反转y轴
             py = Settings.MAX_Y - py
 
-            // 棋子位置反转
+            // 用户执黑,棋子位置旋转
             if (game.settings.userColor == ChessColor.BLACK) {
                 px = Settings.MAX_X - px
                 py = Settings.MAX_Y - py
@@ -97,7 +104,7 @@ class LocationUtility {
             var px = p.x
             var py = p.y
 
-            // 棋子位置反转
+            // 用户执黑,棋子位置旋转
             if (game.settings.userColor == ChessColor.BLACK) {
                 px = Settings.MAX_X - px
                 py = Settings.MAX_Y - py
