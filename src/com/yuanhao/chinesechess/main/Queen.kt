@@ -1,6 +1,6 @@
 package com.yuanhao.chinesechess.main
 
-import com.yuanhao.chinesechess.exceptions.CommanderConflictException
+import com.yuanhao.chinesechess.exceptions.KingConflictException
 import com.yuanhao.chinesechess.exceptions.KingWillDieException
 
 import java.awt.*
@@ -22,8 +22,8 @@ class Queen internal constructor(g: Game, c: ChessColor, private val left: Boole
         if (!canGo(x, y)) {
             return
         }
-        if (checkCommanderConflict(x, y)) {
-            throw CommanderConflictException("将帅不能照面")
+        if (checkKingConflict(x, y)) {
+            throw KingConflictException("将帅不能照面")
         }
         if (checkKingWillDie(x, y)) {
             throw KingWillDieException((if (color == ChessColor.RED) "帅" else "将") + "会被吃掉")

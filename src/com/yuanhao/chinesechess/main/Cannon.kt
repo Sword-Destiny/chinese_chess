@@ -1,6 +1,6 @@
 package com.yuanhao.chinesechess.main
 
-import com.yuanhao.chinesechess.exceptions.CommanderConflictException
+import com.yuanhao.chinesechess.exceptions.KingConflictException
 import com.yuanhao.chinesechess.exceptions.KingWillDieException
 import com.yuanhao.chinesechess.settings.Settings
 import java.awt.Point
@@ -41,13 +41,18 @@ class Cannon internal constructor(g: Game, c: ChessColor, private val left: Bool
     }
 
     /**
-     * 检查炮能不能走
+     * 检查炮有没有被ban,如果没有被ban,就可以走
      */
     private fun checkCannonBan(target: Point): Boolean {
-        if (!checkDifferentColorChessExists(target.x, target.y) && 0 == countMidChessNum(target)) {
+        val differentColorExists = checkDifferentColorChessExists(target.x, target.y)
+        val midChessNum = countMidChessNum(target)
+
+        if (!differentColorExists && 0 == midChessNum) {
+            // 中间没有棋子,也没用目标位置也没有棋子(有己方棋子的情况在canGo里面检查过了)
             return false
         }
-        if (checkDifferentColorChessExists(target.x, target.y) && 1 == countMidChessNum(target)) {
+        if (differentColorExists && 1 == midChessNum) {
+            // 中间有一个棋子,目标位置有敌方棋子则可以走棋
             return false
         }
         return true
@@ -58,8 +63,8 @@ class Cannon internal constructor(g: Game, c: ChessColor, private val left: Bool
         if (!canGo(x, y)) {
             return
         }
-        if (checkCommanderConflict(x, y)) {
-            throw CommanderConflictException("将帅不能照面")
+        if (checkKingConflict(x, y)) {
+            throw KingConflictException("将帅不能照面")
         }
         if (checkKingWillDie(x, y)) {
             throw KingWillDieException((if (color == ChessColor.RED) "帅" else "将") + "会被吃掉")

@@ -11,6 +11,10 @@ import java.util.*
 class Saver {
 
     companion object {
+
+        /**
+         * 将对局保存到文件
+         */
         fun saveGame(g: Game) {
             try {
                 val uuid = UUID.randomUUID().toString()

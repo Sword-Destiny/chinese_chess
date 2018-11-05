@@ -1,6 +1,6 @@
 package com.yuanhao.chinesechess.main
 
-import com.yuanhao.chinesechess.exceptions.CommanderConflictException
+import com.yuanhao.chinesechess.exceptions.KingConflictException
 import com.yuanhao.chinesechess.exceptions.KingWillDieException
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import java.awt.Point
@@ -34,7 +34,7 @@ class Knight internal constructor(g: Game, c: ChessColor, private val left: Bool
     }
 
     /**
-     * 检查马脚中间有没有棋子,能不能走
+     * 检查马脚中间有没有棋子
      */
     private fun checkKnightBan(target: Point): Boolean {
         for (man in game.getSameColorChesses(color)) {
@@ -56,8 +56,8 @@ class Knight internal constructor(g: Game, c: ChessColor, private val left: Bool
         if (!canGo(x, y)) {
             return
         }
-        if (checkCommanderConflict(x, y)) {
-            throw CommanderConflictException("将帅不能照面")
+        if (checkKingConflict(x, y)) {
+            throw KingConflictException("将帅不能照面")
         }
         if (checkKingWillDie(x, y)) {
             throw KingWillDieException((if (color == ChessColor.RED) "帅" else "将") + "会被吃掉")

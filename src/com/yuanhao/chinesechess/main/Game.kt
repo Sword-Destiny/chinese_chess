@@ -14,6 +14,7 @@ import java.util.ArrayList
 /**
  * 游戏
  * 默认红方在下
+ * TODO 和棋判断
  */
 class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Serializable {
 
@@ -57,7 +58,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
 
     internal val recorder: Recorder // 记录器
     internal var status: GameStatus // 当前状态
-    internal var winner: ChessColor? = null
+    internal var winner: ChessColor? = null // 胜者
     internal var userGo: Boolean // 是否轮到用户走棋
 
     init {
@@ -121,7 +122,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     /**
      * 检查将帅冲突
      */
-    fun checkCommanderConflict(x: Int, y: Int, c: ChessColor): Boolean {
+    fun checkKingConflict(x: Int, y: Int, c: ChessColor): Boolean {
         var r: King? = null
         for (man in redAliveChesses) {
             if (man is King) {
@@ -276,7 +277,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
                 man.setLocation(l.x, l.y)
                 val m = getDifferentExistsChess(l.x, l.y, c)
                 m?.die()
-                if (!checkKingWillDie(c) && !checkCommanderConflict(l.x, l.y, c)) {
+                if (!checkKingWillDie(c) && !checkKingConflict(l.x, l.y, c)) {
                     man.setLocation(loc.x, loc.y)
                     m?.alive()
                     return false

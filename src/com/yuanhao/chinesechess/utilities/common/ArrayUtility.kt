@@ -1,5 +1,8 @@
 package com.yuanhao.chinesechess.utilities.common
 
+/**
+ * 数组输出工具类
+ */
 class ArrayUtility {
 
     companion object {

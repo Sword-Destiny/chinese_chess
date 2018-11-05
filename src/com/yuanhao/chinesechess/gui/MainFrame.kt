@@ -14,6 +14,9 @@ import javax.swing.JDialog
 import java.util.TimerTask
 import javax.swing.JOptionPane
 
+/**
+ * 主界面
+ */
 class MainFrame : JFrame() {
     private val game = Game(Settings()) // 游戏
     private val buttons = ArrayList<ChessButton>() // 所有的棋子按钮

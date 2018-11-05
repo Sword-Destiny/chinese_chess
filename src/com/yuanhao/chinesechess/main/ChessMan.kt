@@ -73,18 +73,19 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
      * 先假装移动到新位置
      * 检查将帅照面
      */
-    internal fun checkCommanderConflict(x: Int, y: Int): Boolean {
+    internal fun checkKingConflict(x: Int, y: Int): Boolean {
         val p = Point(location.x, location.y)
         setLocation(x, y)
         val man = game.getDifferentExistsChess(x, y, color)
         man?.die()
-        val conflict = game.checkCommanderConflict(x, y, color)
+        val conflict = game.checkKingConflict(x, y, color)
         setLocation(p.x, p.y)
         man?.alive()
         return conflict
     }
 
     /**
+     * 先假装移动到新位置
      * 检查己方将帅是否被将军
      */
     internal fun checkKingWillDie(x: Int, y: Int): Boolean {

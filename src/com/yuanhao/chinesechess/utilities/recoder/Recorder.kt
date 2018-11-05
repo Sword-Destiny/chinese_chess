@@ -30,7 +30,7 @@ class Recorder(matrix: Array<Array<Int>>) : Serializable {
     }
 
     /**
-     * 记录
+     * 记录一步棋
      */
     fun record(s: Step) {
         steps.add(s)

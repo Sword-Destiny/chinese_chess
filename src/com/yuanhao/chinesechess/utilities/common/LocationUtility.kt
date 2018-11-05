@@ -6,6 +6,9 @@ import com.yuanhao.chinesechess.main.Game
 import com.yuanhao.chinesechess.settings.Settings
 import java.awt.Point
 
+/**
+ * 坐标处理工具类
+ */
 class LocationUtility {
     companion object {
         /**

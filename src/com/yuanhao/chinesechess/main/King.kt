@@ -1,6 +1,6 @@
 package com.yuanhao.chinesechess.main
 
-import com.yuanhao.chinesechess.exceptions.CommanderConflictException
+import com.yuanhao.chinesechess.exceptions.KingConflictException
 import com.yuanhao.chinesechess.exceptions.LocationErrorException
 
 import java.awt.*
@@ -72,8 +72,8 @@ class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c =
         if (!canGo(x, y)) {
             return
         }
-        if (checkCommanderConflict(x, y)) {
-            throw CommanderConflictException("将帅不能照面")
+        if (checkKingConflict(x, y)) {
+            throw KingConflictException("将帅不能照面")
         }
         if (checkKingWillDie(x, y)) {
             throw LocationErrorException("移动到这个位置会被吃掉")

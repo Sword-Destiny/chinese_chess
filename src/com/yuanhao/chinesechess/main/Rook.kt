@@ -1,12 +1,15 @@
 package com.yuanhao.chinesechess.main
 
-import com.yuanhao.chinesechess.exceptions.CommanderConflictException
+import com.yuanhao.chinesechess.exceptions.KingConflictException
 import com.yuanhao.chinesechess.exceptions.KingWillDieException
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import java.awt.Point
 import java.util.ArrayList
 
+/**
+ * 车
+ */
 class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "车") {
 
     override fun matrixNumber(): Int =
@@ -39,7 +42,7 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
     }
 
     /**
-     * 检查车中间有没有棋子,能不能走
+     * 检查车和目标位置之间有没有被其他棋子挡住
      */
     private fun checkRookBan(target: Point): Boolean {
         for (man in game.getSameColorChesses(color)) {
@@ -61,8 +64,8 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
         if (!canGo(x, y)) {
             return
         }
-        if (checkCommanderConflict(x, y)) {
-            throw CommanderConflictException("将帅不能照面")
+        if (checkKingConflict(x, y)) {
+            throw KingConflictException("将帅不能照面")
         }
         if (checkKingWillDie(x, y)) {
             throw KingWillDieException((if (color == ChessColor.RED) "帅" else "将") + "会被吃掉")
