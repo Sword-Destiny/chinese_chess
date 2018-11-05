@@ -8,7 +8,7 @@ import java.util.*
 fun main(args: Array<String>) {
     try {
         val g = Game(Settings())
-        g.startGame()
+        g.start()
         ObjectOutputStream(FileOutputStream(File("data/save.dat"))).use { oos ->
             oos.writeObject(g)
         }

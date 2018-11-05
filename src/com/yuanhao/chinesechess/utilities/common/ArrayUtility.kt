@@ -3,32 +3,34 @@ package com.yuanhao.chinesechess.utilities.common
 class ArrayUtility {
 
     companion object {
-        fun <T> outputArray2D(a: Array<Array<T>>, len: Int) {
+        fun <T> outputArray2D(a: Array<Array<T>>, len: Int): String {
+            var s = ""
             var i = 0
             while (i < a.size - 1) {
-                outputArray1D(a[i], len)
-                println()
+                s += outputArray1D(a[i], len)
+                s += "\n"
                 i++
             }
             if (a.isNotEmpty()) {
-                outputArray1D(a[i], len)
-                println()
+                s += outputArray1D(a[i], len)
+                s += "\n"
             }
+            return s
         }
 
-        fun <T> outputArray1D(a: Array<T>, len: Int) {
+        private fun <T> outputArray1D(a: Array<T>, len: Int): String {
             val f = "%${len}d"
-            print("[")
+            var s = "["
             var i = 0
             while (i < a.size - 1) {
-                print(f.format(a[i]))
-                print(", ")
+                s = s + f.format(a[i]) + ", "
                 i++
             }
             if (a.isNotEmpty()) {
-                print(a[i])
+                s += a[i]
             }
-            print("]")
+            s += "]"
+            return s
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.yuanhao.chinesechess.gui
 
 import com.yuanhao.chinesechess.main.Game
+import com.yuanhao.chinesechess.main.GameStatus
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import java.awt.Point
@@ -13,7 +14,6 @@ import javax.swing.JDialog
 import java.util.TimerTask
 import javax.swing.JOptionPane
 
-
 class MainFrame : JFrame() {
     private val game = Game(Settings()) // 游戏
     private val buttons = ArrayList<ChessButton>() // 所有的棋子按钮
@@ -24,7 +24,7 @@ class MainFrame : JFrame() {
     companion object {
         const val init_x = 200 // 窗口初始位置
         const val init_y = 100 // 窗口初始位置
-        const val total_width = 1200 // 窗口大小
+        const val total_width = 820 // 窗口大小
         const val total_height = 950 // 窗口大小
         const val panel_x = 50 // 棋盘位置
         const val panel_y = 50 // 棋盘位置
@@ -75,10 +75,12 @@ class MainFrame : JFrame() {
             chessButtonClicked(btn)
         }
 
-        game.startGame()
-
         cont.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
+                if (game.status != GameStatus.STARTED) {
+                    super.mouseClicked(e)
+                    return
+                }
                 val p = LocationUtility.frameToChessBoard(e!!.point, game)
                 if (game.userGo) {
                     userMoveChess(p)
@@ -89,6 +91,7 @@ class MainFrame : JFrame() {
             }
         })
 
+        game.start()
     }
 
     /**
@@ -99,6 +102,10 @@ class MainFrame : JFrame() {
         cont.add(btn)
         btn.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
+                if (game.status != GameStatus.STARTED) {
+                    super.mouseClicked(e)
+                    return
+                }
                 if (game.userGo) { // 用户点击
                     if (man.color == game.settings.userColor) {
                         man.isSelected = !man.isSelected
@@ -152,6 +159,7 @@ class MainFrame : JFrame() {
                         }
                         if (game.checkGameOver(game.settings.computerColor)) {
                             showMessage("玩家获胜")
+                            game.end(game.settings.userColor)
                         }
                         true
                     } catch (e: Exception) {
@@ -184,6 +192,7 @@ class MainFrame : JFrame() {
                         }
                         if (game.checkGameOver(game.settings.userColor)) {
                             showMessage("电脑获胜")
+                            game.end(game.settings.computerColor)
                         }
                         true
                     } catch (e: Exception) {
@@ -199,7 +208,7 @@ class MainFrame : JFrame() {
     }
 
     /**
-     * 显示一条2秒的信息
+     * 显示一条1.5秒的信息
      */
     private fun showMessage(msg: String) {
         println(msg)
@@ -217,7 +226,8 @@ class MainFrame : JFrame() {
                 dialog.isVisible = false
                 dialog.dispose()
             }
-        }, 2000)
+        }, 1500)
 
     }
+
 }

@@ -11,7 +11,7 @@ class LocationUtility {
         /**
          * 检测某个棋子是不是在两个棋子中间(横向)
          */
-        internal fun checkBetweenX(check: Point, p: Point, q: Point): Boolean {
+        private fun checkBetweenX(check: Point, p: Point, q: Point): Boolean {
             if (check.y == p.y && check.y == q.y) {
                 if (check.x < p.x && check.x > q.x) {
                     return true

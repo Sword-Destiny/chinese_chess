@@ -9,39 +9,37 @@ import java.util.ArrayList
 /**
  * 设置
  */
-class Settings : Serializable {
-    val userColor: ChessColor//用户执红或者执黑
-    val computerColor:ChessColor
-    val firstStep: FirstStep//用户先手还是电脑先手
-    val redDeficiency: ArrayList<ChessMan>//红方让子
-    val blackDeficiency: ArrayList<ChessMan>//黑方让子
-    val totalTimeSecond: Long//总时长
-    val stepTimeSecond: Int//每一步时长
-
-    constructor() {
-        userColor = ChessColor.RED
-        computerColor = ChessColor.BLACK
-        firstStep = FirstStep.USER
-        redDeficiency = ArrayList()
-        blackDeficiency = ArrayList()
-        totalTimeSecond = java.lang.Long.MAX_VALUE
-        stepTimeSecond = Integer.MAX_VALUE
-    }
-
-    constructor(userColor: ChessColor, firstStep: FirstStep, redDeficiency: ArrayList<ChessMan>, blackDeficiency: ArrayList<ChessMan>, totalTimeSecond: Long, stepTimeSecond: Int) {
-        this.userColor = userColor
-        this.computerColor = if(userColor == ChessColor.RED) ChessColor.BLACK else ChessColor.RED
-        this.firstStep = firstStep
-        this.redDeficiency = redDeficiency
-        this.blackDeficiency = blackDeficiency
-        this.totalTimeSecond = totalTimeSecond
-        this.stepTimeSecond = stepTimeSecond
-    }
+class Settings(uc: ChessColor = ChessColor.RED, cc: ChessColor = ChessColor.BLACK, fs: FirstStep = FirstStep.USER, rd: ArrayList<ChessMan> = ArrayList(), bd: ArrayList<ChessMan> = ArrayList(), tt: Long = Long.MAX_VALUE, st: Long = 180) : Serializable {
+    val userColor = uc // 用户执红或者执黑
+    val computerColor = cc // 电脑颜色
+    val firstStep = fs // 用户先手还是电脑先手
+    private val redDeficiency = rd // 红方让子
+    private val blackDeficiency = bd // 黑方让子
+    private val totalTimeSecond = tt // 总时长
+    private val stepTimeSecond = st // 每一步时长
 
     companion object {
         const val MAX_X = 8
         const val MAX_Y = 9
         const val MIN_X = 0
         const val MIN_Y = 0
+    }
+
+    override fun toString(): String {
+        var s = "先手: " + (if (firstStep == FirstStep.USER) "用户" else "电脑") + "\n"
+        s += "用户颜色: ${userColor.name}\n电脑颜色: ${computerColor.name}\n"
+        s += "红方让子: "
+        for (man in redDeficiency) {
+            s += man.name + " "
+        }
+        s += "\n"
+        s += "黑方让子: "
+        for (man in blackDeficiency) {
+            s += man.name + " "
+        }
+        s += "\n"
+        s += "棋局规定总时长(秒): $totalTimeSecond \n"
+        s += "每步规定时长(秒): $stepTimeSecond \n"
+        return s
     }
 }

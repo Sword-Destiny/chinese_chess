@@ -4,6 +4,7 @@ import com.yuanhao.chinesechess.settings.FirstStep
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import com.yuanhao.chinesechess.utilities.recoder.Recorder
+import com.yuanhao.chinesechess.utilities.recoder.Saver
 import com.yuanhao.chinesechess.utilities.recoder.Step
 import java.awt.Point
 
@@ -54,11 +55,28 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     private val pb3 = Pawn(this, ChessColor.BLACK, 3)//黑卒3
     private val pb4 = Pawn(this, ChessColor.BLACK, 4)//黑卒4
 
-    internal val recorder: Recorder
-
-    internal var userGo: Boolean
+    internal val recorder: Recorder // 记录器
+    internal var status: GameStatus // 当前状态
+    internal var winner: ChessColor? = null
+    internal var userGo: Boolean // 是否轮到用户走棋
 
     init {
+        status = GameStatus.PREPARE
+        addChesses()
+        init()
+        recorder = Recorder(numberMatrix())
+        userGo = FirstStep.USER == settings.firstStep
+    }
+
+    /**
+     * 添加棋子
+     */
+    private fun addChesses() {
+        redAliveChesses.clear()
+        blackAliveChesses.clear()
+        redDeadChesses.clear()
+        blackDeadChesses.clear()
+
         redAliveChesses.add(kr)
         blackAliveChesses.add(kb)
 
@@ -98,12 +116,6 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         blackAliveChesses.add(pb2)
         blackAliveChesses.add(pb3)
         blackAliveChesses.add(pb4)
-
-        initGame()
-
-        recorder = Recorder(numberMatrix())
-
-        userGo = FirstStep.USER == settings.firstStep
     }
 
     /**
@@ -169,14 +181,24 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     /**
      * 开始游戏
      */
-    fun startGame() {
+    fun start() {
+        status = GameStatus.STARTED
         recorder.clear()
+    }
+
+    /**
+     * 游戏结束
+     */
+    fun end(winnerColor: ChessColor) {
+        winner = winnerColor
+        status = GameStatus.ENDED
+        Saver.saveGame(this)
     }
 
     /**
      * 初始化游戏
      */
-    private fun initGame() {
+    private fun init() {
         for (man in redAliveChesses) {
             man.setInitialLocation()
         }
@@ -276,5 +298,18 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
             }
         }
         return null
+    }
+
+    override fun toString(): String {
+        var s = "中国象棋游戏记录:\n" + "最终游戏状态:" + status.name + "\n"
+        if (status == GameStatus.ENDED) {
+            s += "胜利者: " + (if (winner == ChessColor.RED) "红" else "黑") + "方\n"
+        }
+        s += "\n"
+        s += settings.toString()
+        s += "\n"
+        s += recorder.toString()
+        s += "\n"
+        return s
     }
 }

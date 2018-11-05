@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.utilities.recoder
 
+import com.yuanhao.chinesechess.utilities.common.ArrayUtility
 import java.io.Serializable
 
 /**
@@ -44,5 +45,15 @@ class Recorder(matrix: Array<Array<Int>>) : Serializable {
         steps.clear()
     }
 
-
+    override fun toString(): String {
+        var s = "初始状态矩阵:\n"
+        s += ArrayUtility.outputArray2D(initStatus, 2)
+        s += "走棋过程:\n"
+        for (step in steps) {
+            s += step.toString()
+        }
+        s += "最终状态矩阵:\n"
+        s += ArrayUtility.outputArray2D(finalStatus, 2)
+        return s
+    }
 }

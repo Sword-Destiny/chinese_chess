@@ -1,6 +1,7 @@
 package com.yuanhao.chinesechess.utilities.recoder
 
 import com.yuanhao.chinesechess.main.ChessColor
+import com.yuanhao.chinesechess.settings.Settings
 import java.awt.Point
 import java.io.Serializable
 
@@ -12,33 +13,42 @@ class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessCo
     val info: String
     val from: Point = f
     val to: Point = t
+    val color = c
 
     init {
+        val fy = if (uc == ChessColor.RED) f.y else Settings.MAX_Y - f.y
+        val ty = if (uc == ChessColor.RED) t.y else Settings.MAX_Y - t.y
+        val fx = if (uc == ChessColor.RED) f.x else Settings.MAX_X - f.x
+        val tx = if (uc == ChessColor.RED) t.x else Settings.MAX_X - t.x
         val action =
                 if (c == uc) {
                     when {
-                        f.y > t.y -> "退"
-                        f.y < t.y -> "进"
+                        fy > ty -> "退"
+                        fy < ty -> "进"
                         else -> "平"
                     }
                 } else {
                     when {
-                        f.y > t.y -> "进"
-                        f.y < t.y -> "退"
+                        fy > ty -> "进"
+                        fy < ty -> "退"
                         else -> "平"
                     }
                 }
-        val fx = if (c == uc) user_numbers[f.x] else computer_numbers[f.x]
-        val tx = if (c == uc) user_numbers[t.x] else computer_numbers[t.x]
+        val fsx = if (c == uc) user_numbers[fx] else computer_numbers[fx]
+        val tsx = if (c == uc) user_numbers[tx] else computer_numbers[tx]
         info =
-                if (f.y == t.y)
-                    "$n$fx$action$tx"
+                if (fy == ty)
+                    "$n$fsx$action$tsx"
                 else
-                    "$n$fx$action${Math.abs(f.y - t.y)}"
+                    "$n$fsx$action${Math.abs(fy - ty)}"
     }
 
     companion object {
         val user_numbers = arrayOf("九", "八", "七", "六", "五", "四", "三", "二", "一")
         val computer_numbers = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9")
+    }
+
+    override fun toString(): String {
+        return "${color.name} : $info { (${from.x},${from.y}) -> (${to.x},${to.y}) }\n"
     }
 }
