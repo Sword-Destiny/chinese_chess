@@ -1,8 +1,11 @@
 #Chinese Chess
 
+使用kotlin实现
+<br>
 期望实现一个带AI的象棋游戏
 
 界面:
+<br>
 ![image](data/mainframe.jpg)
 
 有步骤记录功能,类似于:
