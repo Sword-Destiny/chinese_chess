@@ -219,7 +219,7 @@ class MainFrame : JFrame() {
         val dialog = op.createDialog("提示")
         dialog.defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
         dialog.isAlwaysOnTop = true
-        dialog.isModal = false
+        dialog.isModal = true
         dialog.isVisible = true
         dialog.setSize(400, 200)
         dialog.setLocation(this.x + this.width / 2 - dialog.width / 2, this.y + this.height / 2 + dialog.height / 2)

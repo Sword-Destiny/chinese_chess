@@ -8,12 +8,13 @@ import java.io.Serializable
 /**
  * c:移动的棋子颜色
  * uc:用户棋子颜色
+ * n:移动的棋子名字
  */
 class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessColor) : Serializable {
-    val info: String
-    val from: Point = f
-    val to: Point = t
-    val color = c
+    val info: String // 走棋信息
+    val from: Point = f // 棋子原位置
+    val to: Point = t // 棋子新位置
+    val color = c // 棋子颜色
 
     init {
         val fy = if (uc == ChessColor.RED) f.y else Settings.MAX_Y - f.y
