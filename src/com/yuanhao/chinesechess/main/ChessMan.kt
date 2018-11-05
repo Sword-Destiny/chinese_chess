@@ -76,8 +76,11 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     internal fun checkCommanderConflict(x: Int, y: Int): Boolean {
         val p = Point(location.x, location.y)
         setLocation(x, y)
-        val conflict = game.checkCommanderConflict(x, y)
+        val man = game.getDifferentExistsChess(x, y, color)
+        man?.die()
+        val conflict = game.checkCommanderConflict(x, y, color)
         setLocation(p.x, p.y)
+        man?.alive()
         return conflict
     }
 
@@ -87,8 +90,11 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     internal fun checkKingWillDie(x: Int, y: Int): Boolean {
         val p = Point(location.x, location.y)
         setLocation(x, y)
+        val man = game.getDifferentExistsChess(x, y, color)
+        man?.die()
         val willDie = game.checkKingWillDie(color)
         setLocation(p.x, p.y)
+        man?.alive()
         return willDie
     }
 
@@ -147,7 +153,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     /**
      * 棋子被吃掉
      */
-    private fun die() {
+    internal fun die() {
         isAlive = false
         if (color === ChessColor.RED) {
             game.redAliveChesses.remove(this)
@@ -156,8 +162,19 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
             game.blackAliveChesses.remove(this)
             game.blackDeadChesses.add(this)
         }
-        if (this is King) {
-            // 游戏结束
+    }
+
+    /**
+     * 棋子活过来(有时候需要判断棋面形式的时候,会假设一些步骤,所以有一些棋子会被假设吃掉)
+     */
+    internal fun alive() {
+        isAlive = true
+        if (color === ChessColor.RED) {
+            game.redAliveChesses.add(this)
+            game.redDeadChesses.remove(this)
+        } else {
+            game.blackAliveChesses.add(this)
+            game.blackDeadChesses.remove(this)
         }
     }
 

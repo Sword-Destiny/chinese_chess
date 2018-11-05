@@ -109,7 +109,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     /**
      * 检查将帅冲突
      */
-    fun checkCommanderConflict(x: Int, y: Int): Boolean {
+    fun checkCommanderConflict(x: Int, y: Int, c: ChessColor): Boolean {
         var r: King? = null
         for (man in redAliveChesses) {
             if (man is King) {
@@ -120,7 +120,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         if (r == null) {
             return false
         }
-        if (r.location.x == x && r.location.y == y) {
+        if (r.location.x == x && r.location.y == y && c == ChessColor.BLACK) {
             return false
         }
         var b: King? = null
@@ -133,7 +133,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         if (b == null) {
             return false
         }
-        if (b.location.x == x && b.location.y == y) {
+        if (b.location.x == x && b.location.y == y && c == ChessColor.RED) {
             return false
         }
         if (r.location.x != b.location.x) {
@@ -251,14 +251,30 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
             val locations = man.listAllLocationsCanGo()
             val loc = Point(man.location.x, man.location.y)
             for (l in locations) {
-                man.setLocation(l.x, l.y);
-                if (!checkKingWillDie(c) && !checkCommanderConflict(l.x, l.y)) {
+                man.setLocation(l.x, l.y)
+                val m = getDifferentExistsChess(l.x, l.y, c)
+                m?.die()
+                if (!checkKingWillDie(c) && !checkCommanderConflict(l.x, l.y, c)) {
                     man.setLocation(loc.x, loc.y)
+                    m?.alive()
                     return false
                 }
+                m?.alive()
             }
             man.setLocation(loc.x, loc.y)
         }
         return true
+    }
+
+    /**
+     * 返回敌方棋子
+     */
+    fun getDifferentExistsChess(x: Int, y: Int, c: ChessColor): ChessMan? {
+        for (man in getDifferentColorChesses(c)) {
+            if (man.location.x == x && man.location.y == y) {
+                return man
+            }
+        }
+        return null
     }
 }

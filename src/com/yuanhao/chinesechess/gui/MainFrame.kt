@@ -1,6 +1,5 @@
 package com.yuanhao.chinesechess.gui
 
-import com.yuanhao.chinesechess.exceptions.KingWillDieException
 import com.yuanhao.chinesechess.main.Game
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
@@ -81,8 +80,10 @@ class MainFrame : JFrame() {
         cont.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 val p = LocationUtility.frameToChessBoard(e!!.point, game)
-                if(game.userGo) {
+                if (game.userGo) {
                     userMoveChess(p)
+                } else {
+                    computerMoveChess(p)
                 }
                 super.mouseClicked(e)
             }
@@ -98,7 +99,7 @@ class MainFrame : JFrame() {
         cont.add(btn)
         btn.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
-                if (game.userGo) {
+                if (game.userGo) { // 用户点击
                     if (man.color == game.settings.userColor) {
                         man.isSelected = !man.isSelected
                         for (m in game.getSameColorChesses(man.color)) {
@@ -111,9 +112,22 @@ class MainFrame : JFrame() {
                             cont.remove(btn)
                         }
                     }
-                    for (b in buttons) {
-                        b.repaint()
+                } else { // 电脑点击
+                    if (man.color == game.settings.computerColor) {
+                        man.isSelected = !man.isSelected
+                        for (m in game.getSameColorChesses(man.color)) {
+                            if (m != man) {
+                                m.isSelected = false
+                            }
+                        }
+                    } else {
+                        if (computerMoveChess(man.location)) {
+                            cont.remove(btn)
+                        }
                     }
+                }
+                for (b in buttons) {
+                    b.repaint()
                 }
                 super.mouseClicked(e)
             }
@@ -138,8 +152,38 @@ class MainFrame : JFrame() {
                         }
                         if (game.checkGameOver(game.settings.computerColor)) {
                             showMessage("玩家获胜")
-                        } else {
-                            computerMoveChess()
+                        }
+                        true
+                    } catch (e: Exception) {
+                        println(e.message)
+                        JOptionPane.showMessageDialog(null, e.message, "错误", JOptionPane.ERROR_MESSAGE)
+                        false
+                    }
+                }
+                break
+            }
+        }
+        return false
+    }
+
+    /**
+     * 电脑AI未实现的时候为了测试某些功能,通过用户走棋代替电脑AI,后续会改变
+     */
+    fun computerMoveChess(p: Point): Boolean {
+        for (btn in buttons) {
+            if (btn.chess.isSelected) {
+                if (btn.chess.canGo(p.x, p.y)) {
+                    return try {
+                        btn.chess.moveTo(p.x, p.y)
+                        val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
+                        btn.move(fp.x, fp.y, cell_width_height - 10)
+                        btn.chess.isSelected = false
+                        game.userGo = !game.userGo
+                        if (game.checkKingWillDie(game.settings.userColor)) {
+                            showMessage("将军")
+                        }
+                        if (game.checkGameOver(game.settings.userColor)) {
+                            showMessage("电脑获胜")
                         }
                         true
                     } catch (e: Exception) {
@@ -158,6 +202,7 @@ class MainFrame : JFrame() {
      * 显示一条2秒的信息
      */
     private fun showMessage(msg: String) {
+        println(msg)
         val op = JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE)
         val dialog = op.createDialog("提示")
         dialog.defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
@@ -175,9 +220,4 @@ class MainFrame : JFrame() {
         }, 2000)
 
     }
-
-    fun computerMoveChess() {
-
-    }
-
 }

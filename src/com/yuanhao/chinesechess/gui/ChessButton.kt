@@ -39,7 +39,8 @@ class ChessButton(color: ChessColor, x: Int, y: Int, s: Int, man: ChessMan) : JB
         repaint()
         addMouseListener(object : MouseAdapter() {
             override fun mouseEntered(e: MouseEvent?) {
-                if(man.game.settings.userColor == man.color) {
+                if (man.game.settings.userColor == man.color && man.game.userGo
+                        || man.game.settings.computerColor == man.color && !man.game.userGo) {
                     cellSize += 6
                     fontSize = cellSize / 2 - 3
                     font = Font("STZhongsong", Font.PLAIN, fontSize)
@@ -51,7 +52,8 @@ class ChessButton(color: ChessColor, x: Int, y: Int, s: Int, man: ChessMan) : JB
             }
 
             override fun mouseExited(e: MouseEvent?) {
-                if(man.game.settings.userColor == man.color) {
+                if (man.game.settings.userColor == man.color && man.game.userGo
+                        || man.game.settings.computerColor == man.color && !man.game.userGo) {
                     cellSize -= 6
                     fontSize = cellSize / 2 - 3
                     font = Font("STZhongsong", Font.PLAIN, fontSize)

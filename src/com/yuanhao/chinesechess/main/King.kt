@@ -44,12 +44,12 @@ class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c =
         for (m in move) {
             val p = Point(location.x + m[0], location.y + m[1])
             if (checkInBoard(p.x, p.y) && !checkSameColorChessExists(p.x, p.y)) {
-                if (p.x < 3 || p.y < 0 || p.x > 5 || p.y > 2) {
+                if (p.x >= 3 && p.y >= 0 && p.x <= 5 && p.y <= 2) {
                     if (color == ChessColor.RED) {
                         points.add(p)
                     }
                 }
-                if (p.x < 3 || p.y < 7 || p.x > 5 || p.y > 9) {
+                if (p.x >= 3 && p.y >= 7 && p.x <= 5 && p.y <= 9) {
                     if (color == ChessColor.BLACK) {
                         points.add(p)
                     }
