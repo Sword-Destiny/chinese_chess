@@ -3,7 +3,7 @@
 期望实现一个带AI的象棋游戏
 
 界面:
-![image][data/mainframe.jpg]
+![image](data/mainframe.jpg)
 
 有步骤记录功能,类似于:
 ```
