@@ -1,9 +1,11 @@
 package com.yuanhao.chinesechess.gui
 
+import com.yuanhao.chinesechess.ai.AI
 import com.yuanhao.chinesechess.main.Game
 import com.yuanhao.chinesechess.main.GameStatus
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
+import com.yuanhao.chinesechess.utilities.recoder.Saver
 import java.awt.Point
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -23,6 +25,9 @@ class MainFrame : JFrame() {
     private val back = JPanel() // 背景面板
     val cont = JPanel() // 内容面板
     private val timer = Timer() // 计时器
+
+    private var aiThread: Thread? = null // ai后台任务
+    private var userGoWithoutAi = false // 用户代替AI
 
     companion object {
         const val init_x = 200 // 窗口初始位置
@@ -166,6 +171,8 @@ class MainFrame : JFrame() {
                         if (game.checkGameOver(game.settings.computerColor)) {
                             showMessage("玩家获胜")
                             game.end(game.settings.userColor)
+                        } else {
+                            startAIThread()
                         }
                         true
                     } catch (e: Exception) {
@@ -181,6 +188,49 @@ class MainFrame : JFrame() {
     }
 
     /**
+     * AI走棋
+     */
+    private fun startAIThread() {
+        userGoWithoutAi = false
+        aiThread = object : Thread() {
+            override fun run() {
+                println("ai thread start")
+                val step = AI.startAnalysis(game)
+                if (!userGoWithoutAi && step != null) {
+                    for (btn in buttons) {
+                        if (btn.chess.location.x == step.from.x && btn.chess.location.y == step.from.y) {
+                            btn.chess.moveTo(step.to.x, step.to.y)
+                            val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
+                            btn.move(fp.x, fp.y, cell_width_height - 10)
+                            btn.chess.isSelected = false
+                            game.userGo = !game.userGo
+                            if (game.checkKingWillDie(game.settings.userColor)) {
+                                showMessage("将军")
+                            }
+                            if (game.checkGameOver(game.settings.userColor)) {
+                                showMessage("电脑获胜")
+                                game.end(game.settings.computerColor)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        aiThread?.start()
+    }
+
+    /**
+     * 停止AI分析线程
+     */
+    @Suppress("DEPRECATION")
+    private fun stopAIThread() {
+        userGoWithoutAi = true
+        aiThread?.stop()
+        Saver.deleteTempFile()
+        println("ai thread stop")
+    }
+
+    /**
      * 电脑AI未实现的时候为了测试某些功能,通过用户走棋代替电脑AI,后续会改变
      */
     fun computerMoveChess(p: Point): Boolean {
@@ -189,6 +239,7 @@ class MainFrame : JFrame() {
                 if (btn.chess.canGo(p.x, p.y)) {
                     return try {
                         btn.chess.moveTo(p.x, p.y)
+                        stopAIThread()
                         val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
                         btn.move(fp.x, fp.y, cell_width_height - 10)
                         btn.chess.isSelected = false
