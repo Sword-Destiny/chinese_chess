@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.main
 
+import com.yuanhao.chinesechess.ai.Score
 import com.yuanhao.chinesechess.exceptions.KingConflictException
 import com.yuanhao.chinesechess.exceptions.LocationErrorException
 
@@ -9,7 +10,14 @@ import java.util.ArrayList
 /**
  * 将，帅
  */
-class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c == ChessColor.RED) "帅" else "将") {
+class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c == ChessColor.RED) "帅" else "将", 10000.0) {
+
+    override fun countStaticScore() {
+        locationScore = 0.0
+        flexibilityScore = Score.BASIC_SCORE * listAllLocationsCanGo().size / 4.0
+        safetyScore = 0.0
+        staticScore = basicScore + locationScore + flexibilityScore + safetyScore
+    }
 
     override fun matrixNumber(): Int = if (color == ChessColor.RED) 11 else 12
 

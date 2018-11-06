@@ -10,11 +10,13 @@ import java.io.Serializable
  * uc:用户棋子颜色
  * n:移动的棋子名字
  */
-class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessColor) : Serializable {
+class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessColor, rs: Double, bs: Double) : Serializable {
     val info: String // 走棋信息
     val from: Point = f // 棋子原位置
     val to: Point = t // 棋子新位置
     val color = c // 棋子颜色
+    val redScore = rs // 红方棋面分数
+    val blackScore = bs // 黑方棋面分数
 
     init {
         // 用户执黑坐标旋转
@@ -55,6 +57,6 @@ class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessCo
     }
 
     override fun toString(): String {
-        return "${color.name} : $info { (${from.x},${from.y}) -> (${to.x},${to.y}) }\n"
+        return "${if (color == ChessColor.RED) "红" else "黑"} : $info \t { (${from.x},${from.y}) -> (${to.x},${to.y}) }   ---   红方棋面得分: $redScore, 黑方棋面得分: $blackScore\n"
     }
 }

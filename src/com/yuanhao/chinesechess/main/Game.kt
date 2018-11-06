@@ -60,6 +60,8 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     internal var status: GameStatus // 当前状态
     private var winner: ChessColor? = null // 胜者
     internal var userGo: Boolean // 是否轮到用户走棋
+    var redScore = 0.0 // 红方棋面得分
+    var blackScore = 0.0 // 黑方棋面得分
 
     init {
         status = GameStatus.PREPARE
@@ -176,7 +178,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
      */
     fun recode(s: Step) {
         recorder.record(s)
-        println(s.info)
+        println("${s.info}, red:${s.redScore}, black:${s.blackScore}")
     }
 
     /**
@@ -313,4 +315,12 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         s += "\n"
         return s
     }
+
+    /**
+     * 返回当前走棋颜色
+     */
+    fun getGoColor(): ChessColor {
+        return if (userGo) settings.userColor else settings.computerColor
+    }
+
 }

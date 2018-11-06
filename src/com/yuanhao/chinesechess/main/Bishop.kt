@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.main
 
+import com.yuanhao.chinesechess.ai.Score
 import com.yuanhao.chinesechess.exceptions.KingConflictException
 import com.yuanhao.chinesechess.exceptions.KingWillDieException
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
@@ -9,7 +10,28 @@ import java.util.ArrayList
 /**
  * 相，象
  */
-class Bishop internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, if (c == ChessColor.RED) "相" else "象") {
+class Bishop internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, if (c == ChessColor.RED) "相" else "象", 100.0) {
+
+    override fun countStaticScore() {
+        // 相,象  最好还是靠近中间
+        locationScore = 0.0
+        if (location.x == 2 || location.x == 6) {
+            locationScore += 10
+        }
+        if (location.x == 4) {
+            locationScore += 20
+        }
+        flexibilityScore = Score.BASIC_SCORE * listAllLocationsCanGo().size / 4.0
+        safetyScore = 0.0
+        for (man in game.getSameColorChesses(color)) {
+            if (man != this) {
+                if (man.canGo(location.x, location.y)) {
+                    safetyScore += Score.SAFETY_RATE * Score.BASIC_SCORE
+                }
+            }
+        }
+        staticScore = basicScore + locationScore + flexibilityScore + safetyScore
+    }
 
     override fun matrixNumber(): Int =
             if (color == ChessColor.RED)

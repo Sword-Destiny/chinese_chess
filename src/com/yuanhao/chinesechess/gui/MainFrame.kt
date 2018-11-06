@@ -167,7 +167,6 @@ class MainFrame : JFrame() {
                         val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
                         btn.move(fp.x, fp.y, cell_width_height - 10)
                         btn.chess.isSelected = false
-                        game.userGo = !game.userGo
                         if (game.checkKingWillDie(game.settings.computerColor)) {
                             showMessage("将军")
                         }
@@ -202,17 +201,21 @@ class MainFrame : JFrame() {
                 if (!userGoWithoutAi && step != null) {
                     for (btn in buttons) {
                         if (btn.chess.location.x == step.from.x && btn.chess.location.y == step.from.y) {
-                            btn.chess.moveTo(step.to.x, step.to.y)
-                            val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
-                            btn.move(fp.x, fp.y, cell_width_height - 10)
-                            btn.chess.isSelected = false
-                            game.userGo = !game.userGo
-                            if (game.checkKingWillDie(game.settings.userColor)) {
-                                showMessage("将军")
-                            }
-                            if (game.checkGameOver(game.settings.userColor)) {
-                                showMessage("电脑获胜")
-                                game.end(game.settings.computerColor)
+                            try {
+                                btn.chess.moveTo(step.to.x, step.to.y)
+                                val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
+                                btn.move(fp.x, fp.y, cell_width_height - 10)
+                                btn.chess.isSelected = false
+                                if (game.checkKingWillDie(game.settings.userColor)) {
+                                    showMessage("将军")
+                                }
+                                if (game.checkGameOver(game.settings.userColor)) {
+                                    showMessage("电脑获胜")
+                                    game.end(game.settings.computerColor)
+                                }
+                            }catch (e:Exception){
+                                e.printStackTrace()
+                                JOptionPane.showMessageDialog(null, e.message, "错误", JOptionPane.ERROR_MESSAGE)
                             }
                         }
                     }
@@ -246,7 +249,6 @@ class MainFrame : JFrame() {
                         val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
                         btn.move(fp.x, fp.y, cell_width_height - 10)
                         btn.chess.isSelected = false
-                        game.userGo = !game.userGo
                         if (game.checkKingWillDie(game.settings.userColor)) {
                             showMessage("将军")
                         }

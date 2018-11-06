@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.main
 
+import com.yuanhao.chinesechess.ai.Score
 import com.yuanhao.chinesechess.exceptions.KingConflictException
 import com.yuanhao.chinesechess.exceptions.KingWillDieException
 import java.awt.Point
@@ -8,7 +9,34 @@ import java.util.ArrayList
 /**
  * 兵卒
  */
-class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, if (c == ChessColor.RED) "兵" else "卒") {
+class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, if (c == ChessColor.RED) "兵" else "卒", 30.0) {
+
+    override fun countStaticScore() {
+        locationScore = 0.0
+        for (man in game.getDifferentColorChesses(color)) {
+            if (man is King) {
+                val d = 16 - location.distance(man.location)
+                locationScore += d * 10
+                // 兵卒不能后退,如果太靠近底部则没有太大的威胁
+                if (location.y > man.location.y && color == ChessColor.RED) {
+                    locationScore -= 50
+                }
+                if (location.y < man.location.y && color == ChessColor.BLACK) {
+                    locationScore -= 50
+                }
+            }
+        }
+        flexibilityScore = Score.BASIC_SCORE * listAllLocationsCanGo().size / 3.0
+        safetyScore = 0.0
+        for (man in game.getSameColorChesses(color)) {
+            if (man != this) {
+                if (man.canGo(location.x, location.y)) {
+                    safetyScore += Score.SAFETY_RATE * (Score.BASIC_SCORE + locationScore)
+                }
+            }
+        }
+        staticScore = basicScore + locationScore + flexibilityScore + safetyScore
+    }
 
     override fun matrixNumber(): Int =
             if (color == ChessColor.RED)

@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.main
 
+import com.yuanhao.chinesechess.ai.Score
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import com.yuanhao.chinesechess.utilities.recoder.Step
@@ -11,11 +12,18 @@ import java.util.ArrayList
 /**
  * 棋子
  */
-abstract class ChessMan internal constructor(val game: Game, val color: ChessColor/*红，黑*/, val name: String) : Serializable {
+abstract class ChessMan internal constructor(val game: Game, val color: ChessColor/*红，黑*/, val name: String, bs: Double) : Serializable {
     private var isAlive: Boolean = false
     var isSelected: Boolean = false // 棋子是否被选中
     val location: Point // 棋子位置
     var lastGo: Boolean // 最后一个移动的棋子
+    val basicScore = bs // 基本子力
+    var score = 0.0 // 棋子当前子力
+    var staticScore = 0.0 // 静态得分
+    var locationScore = 0.0 // 位置得分
+    var safetyScore = 0.0 // 安全性打分
+    var flexibilityScore = 0.0 // 灵活性打分
+    private var threatScore = 0.0 // 威胁性打分
 
     init {
         lastGo = false
@@ -145,10 +153,13 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
                 break
             }
         }
-        val s = Step(Point(location.x, location.y), Point(x, y), name, color, game.settings.userColor)
-        game.recode(s)
+        val p = Point(location.x, location.y)
         setLocation(x, y)
         lastGo = true
+        game.userGo = !game.userGo
+        Score.countChessScores(game)
+        val s = Step(p, Point(x, y), name, color, game.settings.userColor, game.redScore, game.blackScore)
+        game.recode(s)
     }
 
     /**
@@ -192,6 +203,26 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
             game.blackAliveChesses.add(this)
             game.blackDeadChesses.remove(this)
         }
+    }
+
+    /**
+     * 计算静态得分,不包含威胁得分
+     */
+    abstract fun countStaticScore()
+
+    /**
+     * 计算最终得分,包含威胁性得分
+     * 此函数可以迭代
+     */
+    fun countScore(){
+        threatScore = 0.0
+        for (man in game.getDifferentColorChesses(color)){
+            if(canGo(man.location.x,man.location.y)){
+                threatScore += man.staticScore * Score.THREAT_RATE
+            }
+        }
+        score = staticScore + threatScore
+        staticScore = score
     }
 
 }
