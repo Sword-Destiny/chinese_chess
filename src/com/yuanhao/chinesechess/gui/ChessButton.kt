@@ -102,6 +102,9 @@ class ChessButton(color: ChessColor, x: Int, y: Int, s: Int, man: ChessMan) : JB
             g2d.color = Color.BLACK
         }
         g2d.drawOval(1, 1, h - 3, w - 3)
+        if(chess.lastGo){
+            g2d.drawOval(strokeSize + 1, strokeSize + 1, h - strokeSize * 2 - 3, w - strokeSize * 2 - 3)
+        }
         g2d.drawOval(strokeSize * 2 + 1, strokeSize * 2 + 1, h - strokeSize * 4 - 3, w - strokeSize * 4 - 3)
         g2d.dispose()
         super.paintComponent(g)

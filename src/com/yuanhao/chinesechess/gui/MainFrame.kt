@@ -98,6 +98,9 @@ class MainFrame : JFrame() {
                 } else {
                     computerMoveChess(p)
                 }
+                for (b in buttons) {
+                    b.repaint()
+                }
                 super.mouseClicked(e)
             }
         })
@@ -176,7 +179,7 @@ class MainFrame : JFrame() {
                         }
                         true
                     } catch (e: Exception) {
-                        println(e.message)
+                        e.printStackTrace()
                         JOptionPane.showMessageDialog(null, e.message, "错误", JOptionPane.ERROR_MESSAGE)
                         false
                     }
@@ -253,7 +256,7 @@ class MainFrame : JFrame() {
                         }
                         true
                     } catch (e: Exception) {
-                        println(e.message)
+                        e.printStackTrace()
                         JOptionPane.showMessageDialog(null, e.message, "错误", JOptionPane.ERROR_MESSAGE)
                         false
                     }
@@ -273,7 +276,7 @@ class MainFrame : JFrame() {
         val dialog = op.createDialog("提示")
         dialog.defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
         dialog.isAlwaysOnTop = true
-        dialog.isModal = true
+        dialog.isModal = false
         dialog.isVisible = true
         dialog.setSize(400, 200)
         dialog.setLocation(this.x + this.width / 2 - dialog.width / 2, this.y + this.height / 2 + dialog.height / 2)

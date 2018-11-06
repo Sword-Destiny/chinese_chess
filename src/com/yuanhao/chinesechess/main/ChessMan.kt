@@ -13,10 +13,12 @@ import java.util.ArrayList
  */
 abstract class ChessMan internal constructor(val game: Game, val color: ChessColor/*红，黑*/, val name: String) : Serializable {
     private var isAlive: Boolean = false
-    var isSelected: Boolean = false //棋子是否被选中
-    val location: Point//棋子位置
+    var isSelected: Boolean = false // 棋子是否被选中
+    val location: Point // 棋子位置
+    var lastGo: Boolean // 最后一个移动的棋子
 
     init {
+        lastGo = false
         isAlive = true
         isSelected = false
         location = Point(0, 0)
@@ -132,6 +134,12 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     @Throws(Exception::class)
     open fun moveTo(x: Int, y: Int) {
         for (man in game.getDifferentColorChesses(color)) {
+            if (man.lastGo) {
+                man.lastGo = false
+                break
+            }
+        }
+        for (man in game.getDifferentColorChesses(color)) {
             if (man.location.x == x && man.location.y == y) {
                 man.die()
                 break
@@ -140,6 +148,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         val s = Step(Point(location.x, location.y), Point(x, y), name, color, game.settings.userColor)
         game.recode(s)
         setLocation(x, y)
+        lastGo = true
     }
 
     /**
