@@ -4,11 +4,12 @@ import com.yuanhao.chinesechess.main.ChessColor
 import com.yuanhao.chinesechess.main.Game
 import com.yuanhao.chinesechess.utilities.recoder.Saver
 import com.yuanhao.chinesechess.utilities.recoder.Step
+import java.io.Serializable
 
 /**
  * AI 分析,使用打分机制,结合搜索,求最优局面,初始目标大概分析10步左右
  */
-class AI(ps: Int = 5) {
+class AI(ps: Int = 5) : Serializable {
 
     private val predictSteps = ps // 预测的步数
 
