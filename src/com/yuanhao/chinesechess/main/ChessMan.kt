@@ -224,7 +224,11 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         threatScore = 0.0
         for (man in game.getDifferentColorChesses(color)) {
             if (canGo(man.location.x, man.location.y)) {
-                threatScore += man.staticScore * Score.THREAT_RATE
+                threatScore += if(man is King){
+                    Score.BASIC_SCORE
+                }else {
+                    man.staticScore * Score.THREAT_RATE
+                }
             }
         }
         score = staticScore + threatScore

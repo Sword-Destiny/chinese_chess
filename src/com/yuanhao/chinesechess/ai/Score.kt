@@ -14,7 +14,7 @@ class Score {
         /**
          * 威胁性因子
          */
-        const val THREAT_RATE = 0.01
+        const val THREAT_RATE = 0.2
 
         /**
          * 安全性因子
