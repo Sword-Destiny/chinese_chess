@@ -27,6 +27,11 @@ class Score {
         const val WIN = 1000000.0
 
         /**
+         * 吃子得分因子
+         */
+        const val EAT_FACTOR = 0.5
+
+        /**
          * 计算所有棋子的分数
          */
         fun countChessScores(game:Game) {
@@ -54,6 +59,8 @@ class Score {
          * 计算当前红方棋面得分
          */
         private fun countBasicScore(game: Game) {
+            game.redScore = 0.0
+            game.blackScore = 0.0
             val c = game.getGoColor()
             if (c == ChessColor.BLACK) {
                 if (game.checkKingWillDie(ChessColor.BLACK)) {
@@ -61,6 +68,10 @@ class Score {
                     game.redScore = WIN
                     game.blackScore = 0.0
                     return
+                } else {
+                    if(game.recorder.steps.isNotEmpty()) {
+                        game.redScore += game.recorder.lastStep().eatScore
+                    }
                 }
             } else {
                 if (game.checkKingWillDie(ChessColor.RED)) {
@@ -68,18 +79,22 @@ class Score {
                     game.redScore = 0.0
                     game.blackScore = WIN
                     return
+                } else {
+                    if(game.recorder.steps.isNotEmpty()) {
+                        game.blackScore += game.recorder.lastStep().eatScore
+                    }
                 }
             }
             var score = 0.0
             for (man in game.redAliveChesses) {
                 score += man.score
             }
-            game.redScore = score
+            game.redScore += score
             score = 0.0
             for (man in game.blackAliveChesses) {
                 score += man.score
             }
-            game.blackScore = score
+            game.blackScore += score
         }
 
     }

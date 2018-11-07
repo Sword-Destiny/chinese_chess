@@ -1,6 +1,5 @@
 package com.yuanhao.chinesechess.gui
 
-import com.yuanhao.chinesechess.ai.AI
 import com.yuanhao.chinesechess.main.Game
 import com.yuanhao.chinesechess.main.GameStatus
 import com.yuanhao.chinesechess.settings.Settings
@@ -197,7 +196,7 @@ class MainFrame : JFrame() {
         aiThread = object : Thread() {
             override fun run() {
                 println("ai thread start")
-                val step = AI.startAnalysis(game)
+                val step = game.ai.startAnalysis(game)
                 if (!userGoWithoutAi && step != null) {
                     for (btn in buttons) {
                         if (btn.chess.location.x == step.from.x && btn.chess.location.y == step.from.y) {
@@ -213,7 +212,7 @@ class MainFrame : JFrame() {
                                     showMessage("电脑获胜")
                                     game.end(game.settings.computerColor)
                                 }
-                            }catch (e:Exception){
+                            } catch (e: Exception) {
                                 e.printStackTrace()
                                 JOptionPane.showMessageDialog(null, e.message, "错误", JOptionPane.ERROR_MESSAGE)
                             }

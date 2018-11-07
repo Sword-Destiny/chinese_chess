@@ -31,7 +31,7 @@ class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) 
         for (man in game.getSameColorChesses(color)) {
             if (man != this) {
                 if (man.canGo(location.x, location.y)) {
-                    safetyScore += Score.SAFETY_RATE * (Score.BASIC_SCORE + locationScore)
+                    safetyScore += Score.SAFETY_RATE * 2 * (Score.BASIC_SCORE + locationScore)
                 }
             }
         }

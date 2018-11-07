@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.utilities.recoder
 
+import com.yuanhao.chinesechess.ai.Score
 import com.yuanhao.chinesechess.main.ChessColor
 import com.yuanhao.chinesechess.settings.Settings
 import java.awt.Point
@@ -10,13 +11,14 @@ import java.io.Serializable
  * uc:用户棋子颜色
  * n:移动的棋子名字
  */
-class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessColor, rs: Double, bs: Double) : Serializable {
+class Step constructor(f: Point, t: Point, n: String, c: ChessColor, uc: ChessColor, rs: Double, bs: Double, e: Double) : Serializable {
     val info: String // 走棋信息
     val from: Point = f // 棋子原位置
     val to: Point = t // 棋子新位置
     val color = c // 棋子颜色
-    val redScore = rs // 红方棋面分数
-    val blackScore = bs // 黑方棋面分数
+    val redScore = rs // 此步走完之后红方棋面分数
+    val blackScore = bs // 此步走完之后黑方棋面分数
+    val eatScore = Score.EAT_FACTOR * e // 吃子得分
 
     init {
         // 用户执黑坐标旋转

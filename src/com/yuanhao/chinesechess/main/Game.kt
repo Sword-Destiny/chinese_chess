@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.main
 
+import com.yuanhao.chinesechess.ai.AI
 import com.yuanhao.chinesechess.settings.FirstStep
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
@@ -62,6 +63,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     internal var userGo: Boolean // 是否轮到用户走棋
     var redScore = 0.0 // 红方棋面得分
     var blackScore = 0.0 // 黑方棋面得分
+    val ai = AI() // AI
 
     init {
         status = GameStatus.PREPARE

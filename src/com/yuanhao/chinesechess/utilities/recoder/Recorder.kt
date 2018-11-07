@@ -8,7 +8,7 @@ import java.io.Serializable
  */
 class Recorder(matrix: Array<Array<Int>>) : Serializable {
 
-    private val steps = ArrayList<Step>() // 走棋记录
+    internal val steps = ArrayList<Step>() // 走棋记录
     internal val initStatus: Array<Array<Int>> // 初始棋盘
     internal val finalStatus: Array<Array<Int>> // 最终棋盘或者说当前棋盘
 
@@ -34,6 +34,13 @@ class Recorder(matrix: Array<Array<Int>>) : Serializable {
         steps.add(s)
         finalStatus[s.to.x][s.to.y] = finalStatus[s.from.x][s.from.y]
         finalStatus[s.from.x][s.from.y] = 0
+    }
+
+    /**
+     * 最后一步
+     */
+    fun lastStep(): Step {
+        return steps.last()
     }
 
     /**

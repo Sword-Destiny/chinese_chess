@@ -1,5 +1,6 @@
 package com.yuanhao.chinesechess.main
 
+import com.yuanhao.chinesechess.ai.AI
 import com.yuanhao.chinesechess.ai.Score
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
@@ -147,9 +148,12 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
                 break
             }
         }
+        var eatScore = 0.0
         for (man in game.getDifferentColorChesses(color)) {
             if (man.location.x == x && man.location.y == y) {
+                eatScore = man.score
                 man.die()
+                println("eat: ${man.name}")
                 break
             }
         }
@@ -158,8 +162,11 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         lastGo = true
         game.userGo = !game.userGo
         Score.countChessScores(game)
-        val s = Step(p, Point(x, y), name, color, game.settings.userColor, game.redScore, game.blackScore)
+        val s = Step(p, Point(x, y), name, color, game.settings.userColor, game.redScore, game.blackScore, eatScore)
         game.recode(s)
+        if (!game.userGo) {
+            AI.learnUserAggressive(game)
+        }
     }
 
     /**
@@ -214,10 +221,10 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
      * 计算最终得分,包含威胁性得分
      * 此函数可以迭代
      */
-    fun countScore(){
+    fun countScore() {
         threatScore = 0.0
-        for (man in game.getDifferentColorChesses(color)){
-            if(canGo(man.location.x,man.location.y)){
+        for (man in game.getDifferentColorChesses(color)) {
+            if (canGo(man.location.x, man.location.y)) {
                 threatScore += man.staticScore * Score.THREAT_RATE
             }
         }
