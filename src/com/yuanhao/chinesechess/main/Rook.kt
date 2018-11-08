@@ -11,7 +11,7 @@ import java.util.ArrayList
 /**
  * 车
  */
-class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "车", 400.0) {
+class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "车", 500.0) {
 
     override fun countStaticScore() {
         locationScore = 0.0

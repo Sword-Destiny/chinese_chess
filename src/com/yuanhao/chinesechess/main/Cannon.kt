@@ -10,7 +10,7 @@ import java.util.ArrayList
 /**
  * 炮
  */
-class Cannon internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "炮", 200.0) {
+class Cannon internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "炮", 240.0) {
 
     override fun countStaticScore() {
         locationScore = 0.0

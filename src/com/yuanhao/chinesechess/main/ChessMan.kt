@@ -161,7 +161,8 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         lastGo = true
         game.userGo = !game.userGo
         Score.countChessScores(game)
-        val s = Step(p, Point(x, y), name, color, game.settings.userColor, game.redScore, game.blackScore, eatScore)
+        val s = Step(p, Point(x, y), name, this, game.settings.userColor, game.redScore, game.blackScore, eatScore)
+        print(s)
         game.recode(s)
         if (!game.userGo) {
             game.ai.learnUserAggressive(game)

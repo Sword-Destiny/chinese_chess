@@ -69,7 +69,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         status = GameStatus.PREPARE
         addChesses()
         init()
-        recorder = Recorder(numberMatrix())
+        recorder = Recorder(numberMatrix(),this)
         userGo = FirstStep.USER == settings.firstStep
     }
 
@@ -180,7 +180,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
      */
     fun recode(s: Step) {
         recorder.record(s)
-        println("${s.info}, red:${s.redScore}, black:${s.blackScore}")
+//        println("${s.info}, red:${s.redScore}, black:${s.blackScore}")
     }
 
     /**
@@ -245,6 +245,17 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
             redAliveChesses
         } else {
             blackAliveChesses
+        }
+    }
+
+    /**
+     * 敌方已死亡的棋子
+     */
+    fun getDifferentDeadChesses(color: ChessColor):ArrayList<ChessMan>{
+        return if(color==ChessColor.BLACK){
+            redDeadChesses
+        }else{
+            blackDeadChesses
         }
     }
 

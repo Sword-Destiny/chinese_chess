@@ -201,6 +201,12 @@ class MainFrame : JFrame() {
                     for (btn in buttons) {
                         if (btn.chess.location.x == step.from.x && btn.chess.location.y == step.from.y) {
                             try {
+                                for (b in buttons) {
+                                    if (b.chess.location.x == step.to.x && b.chess.location.y == step.to.y) {
+                                        cont.remove(b)
+                                        break
+                                    }
+                                }
                                 btn.chess.moveTo(step.to.x, step.to.y)
                                 val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
                                 btn.move(fp.x, fp.y, cell_width_height - 10)
