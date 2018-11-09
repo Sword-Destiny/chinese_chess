@@ -8,6 +8,7 @@ import com.yuanhao.chinesechess.utilities.recoder.Step
 import java.awt.*
 import java.io.Serializable
 import java.util.ArrayList
+import kotlin.math.sqrt
 
 /**
  * 棋子
@@ -15,7 +16,8 @@ import java.util.ArrayList
 abstract class ChessMan internal constructor(val game: Game, val color: ChessColor/*红，黑*/, val name: String, bs: Double) : Serializable {
     private var isAlive: Boolean = false
     var isSelected: Boolean = false // 棋子是否被选中
-    val location: Point // 棋子位置
+    var x: Int // 棋子位置
+    var y: Int // 棋子位置
     var lastGo: Boolean // 最后一个移动的棋子
     val basicScore = bs // 基本子力
     var score = 0.0 // 棋子当前子力
@@ -29,14 +31,16 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         lastGo = false
         isAlive = true
         isSelected = false
-        location = Point(0, 0)
+        x = 0
+        y = 0
     }
 
     /**
      * 设置棋子位置
      */
     internal fun setLocation(x: Int, y: Int) {
-        location.setLocation(x, y)
+        this.x = x
+        this.y = y
     }
 
     /**
@@ -61,7 +65,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
      */
     internal fun checkSameColorChessExists(x: Int, y: Int): Boolean {
         for (man in game.getSameColorChesses(color)) {
-            if (man.location.x == x && man.location.y == y) {
+            if (man.x == x && man.y == y) {
                 // 此位置上已有己方棋子
                 return true
             }
@@ -74,7 +78,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
      */
     internal fun checkDifferentColorChessExists(x: Int, y: Int): Boolean {
         for (man in game.getDifferentColorChesses(color)) {
-            if (man.location.x == x && man.location.y == y) {
+            if (man.x == x && man.y == y) {
                 // 此位置上已有己方棋子
                 return true
             }
@@ -88,7 +92,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
      * 然后再移动回原位置
      */
     internal fun checkKingConflict(x: Int, y: Int): Boolean {
-        val p = Point(location.x, location.y)
+        val p = Point(this.x, this.y)
         setLocation(x, y)
         val man = game.getDifferentExistsChess(x, y, color)
         man?.die()
@@ -104,7 +108,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
      * 然后再移动回原位置
      */
     internal fun checkKingWillDie(x: Int, y: Int): Boolean {
-        val p = Point(location.x, location.y)
+        val p = Point(this.x, this.y)
         setLocation(x, y)
         val man = game.getDifferentExistsChess(x, y, color)
         man?.die()
@@ -117,16 +121,16 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     /**
      * 计算两个棋子中间棋子的数量
      */
-    internal fun countMidChessNum(target: Point): Int {
+    internal fun countMidChessNum(targetX: Int, targetY: Int): Int {
         var res = 0
         for (man in game.getSameColorChesses(color)) {
-            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
+            if (LocationUtility.checkBetweenXY(man.x, man.y, x, y, targetX, targetY)) {
                 res++
             }
         }
 
         for (man in game.getDifferentColorChesses(color)) {
-            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
+            if (LocationUtility.checkBetweenXY(man.x, man.y, x, y, targetX, targetY)) {
                 res++
             }
         }
@@ -149,24 +153,31 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         }
         var eatScore = 0.0
         for (man in game.getDifferentColorChesses(color)) {
-            if (man.location.x == x && man.location.y == y) {
+            if (man.x == x && man.y == y) {
                 eatScore = man.score
                 man.die()
                 println("eat: ${man.name}")
                 break
             }
         }
-        val p = Point(location.x, location.y)
+        val p = Point(this.x, this.y)
         setLocation(x, y)
         lastGo = true
         game.userGo = !game.userGo
         Score.countChessScores(game)
-        val s = Step(p, Point(x, y), name, this, game.settings.userColor, game.redScore, game.blackScore, eatScore)
-        print(s)
+        val s = Step(p.x, p.y, x, y, this, game.redScore, game.blackScore, eatScore)
+        println(s)
         game.recode(s)
         if (!game.userGo) {
             game.ai.learnUserAggressive(game)
         }
+    }
+
+    /**
+     * 距离
+     */
+    fun distance(man: ChessMan): Double {
+        return sqrt(((x - man.x) * (x - man.x) + (y - man.y) * (y - man.y)).toDouble())
     }
 
     /**
@@ -224,10 +235,10 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
     fun countScore() {
         threatScore = 0.0
         for (man in game.getDifferentColorChesses(color)) {
-            if (canGo(man.location.x, man.location.y)) {
-                threatScore += if(man is King){
+            if (canGo(man.x, man.y)) {
+                threatScore += if (man is King) {
                     Score.BASIC_SCORE
-                }else {
+                } else {
                     man.staticScore * Score.THREAT_RATE
                 }
             }

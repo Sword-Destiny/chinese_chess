@@ -75,6 +75,7 @@ class AI(ps: Int = 3) : Serializable {
 
     /**
      * 最终决定走哪一步棋
+     * TODO 判断一步棋的分数,还要看下一步棋可能的情况,情况越少的,权重越高
      */
     private fun decideStep(): Step? {
         for (pair in stepNs) {
@@ -108,25 +109,25 @@ class AI(ps: Int = 3) : Serializable {
         val last = if (g.recorder.steps.isNotEmpty()) g.recorder.steps.last() else null
         val steps = listAllLocationCanGo(g, c)
         for (s in steps) {
-            computeUp(s, last, g)
+            computeUp(s, last, g, c)
         }
         for (s in steps) {
             step1s[s] = com.yuanhao.chinesechess.utilities.common.Pair(0, 0.0)
         }
         for (s in steps) {
-            stepNs.add(Pair(s, arrayListOf(s)))
+            stepNs.add(Pair(s, ArrayList()))
         }
-        var nStep = ps - 1
-        var cc = if (c == ChessColor.RED) ChessColor.BLACK else ChessColor.RED
+        var nStep = ps
+        var cc = c
 
         while (nStep > 0) {
             var tmp = ArrayList<Pair<Step, ArrayList<Step>>>()
-            analysisAStep(tmp, g, cc, last) // 分析对方一步
+            analysisAStep(tmp, g, c, cc, last) // 分析己方一步
             stepNs.clear()
             stepNs = tmp
             cc = if (cc == ChessColor.RED) ChessColor.BLACK else ChessColor.RED
             tmp = ArrayList()
-            analysisAStep(tmp, g, cc, last) // 分析己方一步
+            analysisAStep(tmp, g, c, cc, last) // 分析对方一步
             stepNs.clear()
             stepNs = tmp
             cc = if (cc == ChessColor.RED) ChessColor.BLACK else ChessColor.RED
@@ -142,18 +143,33 @@ class AI(ps: Int = 3) : Serializable {
 
     /**
      * 分析一步
+     * c:电脑颜色
+     * cc:当前走棋颜色
      */
-    private fun analysisAStep(tmp: ArrayList<Pair<Step, ArrayList<Step>>>, g: Game, cc: ChessColor, last: Step?) {
+    private fun analysisAStep(tmp: ArrayList<Pair<Step, ArrayList<Step>>>, g: Game, c: ChessColor, cc: ChessColor, last: Step?) {
         for (pair in stepNs) {
             for (s in pair.second) {
                 g.recorder.applyStep(s)
             }
             val next = listAllLocationCanGo(g, cc)
-            /**
-             * TODO:对手的走棋不是随便的,选择最有可能的3-5步棋
-             */
+            if (c != cc) {
+                /**
+                 * TODO:对手的走棋不是随便的,选择最有可能的3-5步棋
+                 */
+            }
+            if (next.size == 0) {
+                if (c != cc) {
+                    /**
+                     * TODO 胜局
+                     */
+                } else {
+                    /**
+                     * TODO 死局
+                     */
+                }
+            }
             for (s in next) {
-                computeUp(s, last, g)
+                computeUp(s, last, g, c)
                 val list = ArrayList<Step>()
                 list.addAll(pair.second)
                 list.add(s)
@@ -192,18 +208,18 @@ class AI(ps: Int = 3) : Serializable {
     private fun moveChess(chess: ChessMan, g: Game, x: Int, y: Int) {
         var eatScore = 0.0
         for (man in g.getDifferentColorChesses(chess.color)) {
-            if (man.location.x == x && man.location.y == y) {
+            if (man.x == x && man.y == y) {
                 eatScore = man.score * Score.THREAT_RATE
                 man.die()
                 break
             }
         }
-        val p = Point(chess.location.x, chess.location.y)
+        val p = Point(chess.x, chess.y)
         chess.setLocation(x, y)
         g.userGo = !g.userGo
         Score.countChessScores(g)
-        val s = Step(p, Point(x, y), chess.name, chess, g.settings.userColor, g.redScore, g.blackScore, eatScore)
-        g.recode(s)
+        val s = Step(p.x, p.y, x, y, chess, g.redScore, g.blackScore, eatScore)
+        g.recorder.steps.add(s)
     }
 
     /**
@@ -237,9 +253,9 @@ class AI(ps: Int = 3) : Serializable {
     /**
      * 计算局势变化增量
      */
-    private fun computeUp(step: Step, preStep: Step?, g: Game): Double {
-        var meUp = step.getSameColorScore(step.chess.color) - (preStep?.getSameColorScore(step.chess.color) ?: 0.0)
-        val youUp = step.getDifferentColorScore(step.chess.color) - (preStep?.getDifferentColorScore(step.chess.color)
+    private fun computeUp(step: Step, preStep: Step?, g: Game, c: ChessColor): Double {
+        var meUp = step.getSameColorScore(c) - (preStep?.getSameColorScore(c) ?: 0.0)
+        val youUp = step.getDifferentColorScore(c) - (preStep?.getDifferentColorScore(c)
                 ?: 0.0)
         if (step.chess.color == g.settings.computerColor) {
             if (meUp >= 0.0) {

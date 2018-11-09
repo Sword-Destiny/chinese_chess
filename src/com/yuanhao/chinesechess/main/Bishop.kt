@@ -10,22 +10,22 @@ import java.util.ArrayList
 /**
  * 相，象
  */
-class Bishop internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, if (c == ChessColor.RED) "相" else "象", 100.0) {
+class Bishop internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, if (c == ChessColor.RED) "相" else "象", 150.0) {
 
     override fun countStaticScore() {
         // 相,象  最好还是靠近中间
         locationScore = 0.0
-        if (location.x == 2 || location.x == 6) {
+        if (this.x == 2 || this.x == 6) {
             locationScore += 10
         }
-        if (location.x == 4) {
+        if (this.x == 4) {
             locationScore += 20
         }
         flexibilityScore = Score.BASIC_SCORE * listAllLocationsCanGo().size / 4.0
         safetyScore = 0.0
         for (man in game.getSameColorChesses(color)) {
             if (man != this) {
-                if (man.canGo(location.x, location.y)) {
+                if (man.canGo(this.x, this.y)) {
                     safetyScore += Score.SAFETY_RATE * Score.BASIC_SCORE
                 }
             }
@@ -45,17 +45,17 @@ class Bishop internal constructor(g: Game, c: ChessColor, private val left: Bool
         }
         val move = arrayOf(arrayOf(2, 2), arrayOf(2, -2), arrayOf(-2, 2), arrayOf(-2, -2))
         for (m in move) {
-            val p = Point(location.x + m[0], location.y + m[1])
+            val p = Point(this.x + m[0], this.y + m[1])
             if (p.x == x && p.y == y) {
                 if (color == ChessColor.RED) {
                     if (p.y <= 4) {
-                        if (!checkBishopMidChess(p)) {
+                        if (!checkBishopMidChess(p.x, p.y)) {
                             return true
                         }
                     }
                 } else {
                     if (p.y >= 5) {
-                        if (!checkBishopMidChess(p)) {
+                        if (!checkBishopMidChess(p.x, p.y)) {
                             return true
                         }
                     }
@@ -68,15 +68,15 @@ class Bishop internal constructor(g: Game, c: ChessColor, private val left: Bool
     /**
      * 检查象脚中间有没有棋子
      */
-    private fun checkBishopMidChess(target: Point): Boolean {
+    private fun checkBishopMidChess(targetX: Int, targetY: Int): Boolean {
         for (man in game.getSameColorChesses(color)) {
-            if (LocationUtility.checkBetween2D(man.location, location, target)) {
+            if (LocationUtility.checkBetween2D(man.x, man.y, x, y, targetX, targetY)) {
                 return true
             }
         }
 
         for (man in game.getDifferentColorChesses(color)) {
-            if (LocationUtility.checkBetween2D(man.location, location, target)) {
+            if (LocationUtility.checkBetween2D(man.x, man.y, x, y, targetX, targetY)) {
                 return true
             }
         }
@@ -117,17 +117,17 @@ class Bishop internal constructor(g: Game, c: ChessColor, private val left: Bool
         val points = ArrayList<Point>()
         val move = arrayOf(arrayOf(2, 2), arrayOf(2, -2), arrayOf(-2, 2), arrayOf(-2, -2))
         for (m in move) {
-            val p = Point(location.x + m[0], location.y + m[1])
+            val p = Point(this.x + m[0], this.y + m[1])
             if (checkInBoard(p.x, p.y) && !checkSameColorChessExists(p.x, p.y)) {
                 if (color == ChessColor.RED) {
                     if (p.y <= 4) {
-                        if (!checkBishopMidChess(p)) {
+                        if (!checkBishopMidChess(p.x, p.y)) {
                             points.add(p)
                         }
                     }
                 } else {
                     if (p.y >= 5) {
-                        if (!checkBishopMidChess(p)) {
+                        if (!checkBishopMidChess(p.x, p.y)) {
                             points.add(p)
                         }
                     }

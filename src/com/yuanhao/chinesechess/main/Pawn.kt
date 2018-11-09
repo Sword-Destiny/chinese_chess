@@ -9,19 +9,19 @@ import java.util.ArrayList
 /**
  * 兵卒
  */
-class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, if (c == ChessColor.RED) "兵" else "卒", 30.0) {
+class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, if (c == ChessColor.RED) "兵" else "卒", 100.0) {
 
     override fun countStaticScore() {
         locationScore = 0.0
         for (man in game.getDifferentColorChesses(color)) {
             if (man is King) {
-                val d = 16 - location.distance(man.location)
+                val d = 16 - this.distance(man)
                 locationScore += d * 10
                 // 兵卒不能后退,如果太靠近底部则没有太大的威胁
-                if (location.y > man.location.y && color == ChessColor.RED) {
+                if (this.y > man.y && color == ChessColor.RED) {
                     locationScore -= 50
                 }
-                if (location.y < man.location.y && color == ChessColor.BLACK) {
+                if (this.y < man.y && color == ChessColor.BLACK) {
                     locationScore -= 50
                 }
             }
@@ -30,7 +30,7 @@ class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) 
         safetyScore = 0.0
         for (man in game.getSameColorChesses(color)) {
             if (man != this) {
-                if (man.canGo(location.x, location.y)) {
+                if (man.canGo(this.x, this.y)) {
                     safetyScore += Score.SAFETY_RATE * 2 * (Score.BASIC_SCORE + locationScore)
                 }
             }
@@ -50,13 +50,13 @@ class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) 
         }
         val move =
                 if (color == ChessColor.RED)
-                    if (location.y <= 4) arrayOf(arrayOf(0, 1))
+                    if (this.y <= 4) arrayOf(arrayOf(0, 1))
                     else arrayOf(arrayOf(0, 1), arrayOf(-1, 0), arrayOf(1, 0))
                 else
-                    if (location.y >= 5) arrayOf(arrayOf(0, -1))
+                    if (this.y >= 5) arrayOf(arrayOf(0, -1))
                     else arrayOf(arrayOf(0, -1), arrayOf(-1, 0), arrayOf(1, 0))
         for (m in move) {
-            val p = Point(location.x + m[0], location.y + m[1])
+            val p = Point(this.x + m[0], this.y + m[1])
             if (p.x == x && p.y == y) {
                 return true
             }
@@ -92,13 +92,13 @@ class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) 
         val points = ArrayList<Point>()
         val move =
                 if (color == ChessColor.RED)
-                    if (location.y <= 4) arrayOf(arrayOf(0, 1))
+                    if (this.y <= 4) arrayOf(arrayOf(0, 1))
                     else arrayOf(arrayOf(0, 1), arrayOf(-1, 0), arrayOf(1, 0))
                 else
-                    if (location.y >= 5) arrayOf(arrayOf(0, -1))
+                    if (this.y >= 5) arrayOf(arrayOf(0, -1))
                     else arrayOf(arrayOf(0, -1), arrayOf(-1, 0), arrayOf(1, 0))
         for (m in move) {
-            val p = Point(location.x + m[0], location.y + m[1])
+            val p = Point(this.x + m[0], this.y + m[1])
             if (checkInBoard(p.x, p.y) && !checkSameColorChessExists(p.x, p.y)) {
                 points.add(p)
             }

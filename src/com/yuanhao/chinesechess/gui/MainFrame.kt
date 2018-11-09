@@ -5,7 +5,6 @@ import com.yuanhao.chinesechess.main.GameStatus
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
 import com.yuanhao.chinesechess.utilities.recoder.Saver
-import java.awt.Point
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.lang.Exception
@@ -69,12 +68,12 @@ class MainFrame : JFrame() {
         cont.setLocation(0, 0)
         layeredPane.add(cont, 0)
         for (man in game.redAliveChesses) {
-            val p = LocationUtility.chessBoardToFrame(man.location, game)
+            val p = LocationUtility.chessBoardToFrame(man.x, man.y, game)
             val btn = ChessButton(man.color, p.x, p.y, cell_width_height - 16, man)
             buttons.add(btn)
         }
         for (man in game.blackAliveChesses) {
-            val p = LocationUtility.chessBoardToFrame(man.location, game)
+            val p = LocationUtility.chessBoardToFrame(man.x, man.y, game)
             val btn = ChessButton(man.color, p.x, p.y, cell_width_height - 16, man)
             buttons.add(btn)
         }
@@ -91,11 +90,11 @@ class MainFrame : JFrame() {
                     super.mouseClicked(e)
                     return
                 }
-                val p = LocationUtility.frameToChessBoard(e!!.point, game)
+                val p = LocationUtility.frameToChessBoard(e!!.x, e.y, game)
                 if (game.userGo) {
-                    userMoveChess(p)
+                    userMoveChess(p.x, p.y)
                 } else {
-                    computerMoveChess(p)
+                    computerMoveChess(p.x, p.y)
                 }
                 for (b in buttons) {
                     b.repaint()
@@ -128,7 +127,7 @@ class MainFrame : JFrame() {
                             }
                         }
                     } else {
-                        if (userMoveChess(man.location)) {
+                        if (userMoveChess(man.x, man.y)) {
                             cont.remove(btn)
                         }
                     }
@@ -141,7 +140,7 @@ class MainFrame : JFrame() {
                             }
                         }
                     } else {
-                        if (computerMoveChess(man.location)) {
+                        if (computerMoveChess(man.x, man.y)) {
                             cont.remove(btn)
                         }
                     }
@@ -157,13 +156,14 @@ class MainFrame : JFrame() {
     /**
      * 玩家移动棋子
      */
-    fun userMoveChess(p: Point): Boolean {
+    fun userMoveChess(px: Int, py: Int): Boolean {
         for (btn in buttons) {
             if (btn.chess.isSelected) {
-                if (btn.chess.canGo(p.x, p.y)) {
+                if (btn.chess.canGo(px, py)) {
                     return try {
-                        btn.chess.moveTo(p.x, p.y)
-                        val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
+                        print("User: ")
+                        btn.chess.moveTo(px, py)
+                        val fp = LocationUtility.chessBoardToFrame(btn.chess.x, btn.chess.y, game)
                         btn.move(fp.x, fp.y, cell_width_height - 10)
                         btn.chess.isSelected = false
                         if (game.checkKingWillDie(game.settings.computerColor)) {
@@ -199,16 +199,17 @@ class MainFrame : JFrame() {
                 val step = game.ai.startAnalysis(game)
                 if (!userGoWithoutAi && step != null) {
                     for (btn in buttons) {
-                        if (btn.chess.location.x == step.from.x && btn.chess.location.y == step.from.y) {
+                        if (btn.chess.x == step.fromX && btn.chess.y == step.fromY) {
                             try {
                                 for (b in buttons) {
-                                    if (b.chess.location.x == step.to.x && b.chess.location.y == step.to.y) {
+                                    if (b.chess.x == step.toX && b.chess.y == step.toY) {
                                         cont.remove(b)
                                         break
                                     }
                                 }
-                                btn.chess.moveTo(step.to.x, step.to.y)
-                                val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
+                                print("AI: ")
+                                btn.chess.moveTo(step.toX, step.toY)
+                                val fp = LocationUtility.chessBoardToFrame(btn.chess.x, btn.chess.y, game)
                                 btn.move(fp.x, fp.y, cell_width_height - 10)
                                 btn.chess.isSelected = false
                                 if (game.checkKingWillDie(game.settings.userColor)) {
@@ -244,14 +245,15 @@ class MainFrame : JFrame() {
     /**
      * 电脑AI未实现的时候为了测试某些功能,通过用户走棋代替电脑AI,后续会改变
      */
-    fun computerMoveChess(p: Point): Boolean {
+    fun computerMoveChess(px: Int, py: Int): Boolean {
         for (btn in buttons) {
             if (btn.chess.isSelected) {
-                if (btn.chess.canGo(p.x, p.y)) {
+                if (btn.chess.canGo(px, py)) {
                     return try {
-                        btn.chess.moveTo(p.x, p.y)
+                        print("User as Computer: ")
+                        btn.chess.moveTo(px, py)
                         stopAIThread()
-                        val fp = LocationUtility.chessBoardToFrame(btn.chess.location, game)
+                        val fp = LocationUtility.chessBoardToFrame(btn.chess.x, btn.chess.y, game)
                         btn.move(fp.x, fp.y, cell_width_height - 10)
                         btn.chess.isSelected = false
                         if (game.checkKingWillDie(game.settings.userColor)) {

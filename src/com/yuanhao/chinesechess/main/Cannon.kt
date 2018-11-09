@@ -10,24 +10,24 @@ import java.util.ArrayList
 /**
  * 炮
  */
-class Cannon internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "炮", 240.0) {
+class Cannon internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "炮", 200.0) {
 
     override fun countStaticScore() {
         locationScore = 0.0
-        if(location.x in 3..5){
+        if (this.x in 3..5) {
             locationScore += 30
         }
-        if(location.y in 7..9 && color == ChessColor.RED){
+        if (this.y in 7..9 && color == ChessColor.RED) {
             locationScore += 30
         }
-        if(location.y in 0..2 && color == ChessColor.BLACK){
+        if (this.y in 0..2 && color == ChessColor.BLACK) {
             locationScore += 30
         }
         flexibilityScore = Score.BASIC_SCORE * listAllLocationsCanGo().size / 17.0
         safetyScore = 0.0
         for (man in game.getSameColorChesses(color)) {
             if (man != this) {
-                if (man.canGo(location.x, location.y)) {
+                if (man.canGo(this.x, this.y)) {
                     safetyScore += Score.SAFETY_RATE * (Score.BASIC_SCORE + locationScore)
                 }
             }
@@ -47,16 +47,16 @@ class Cannon internal constructor(g: Game, c: ChessColor, private val left: Bool
         }
         val move = ArrayList<Point>()
         for (mx in Settings.MIN_X..Settings.MAX_X + 1) {
-            if (mx != location.x)
-                move.add(Point(mx, location.y))
+            if (mx != this.x)
+                move.add(Point(mx, this.y))
         }
         for (my in Settings.MIN_Y..Settings.MAX_Y + 1) {
-            if (my != location.y)
-                move.add(Point(location.x, my))
+            if (my != this.y)
+                move.add(Point(this.x, my))
         }
         for (m in move) {
             if (m.x == x && m.y == y) {
-                if (!checkCannonBan(m)) {
+                if (!checkCannonBan(m.x, m.y)) {
                     return true
                 }
             }
@@ -67,9 +67,9 @@ class Cannon internal constructor(g: Game, c: ChessColor, private val left: Bool
     /**
      * 检查炮有没有被ban,如果没有被ban,就可以走
      */
-    private fun checkCannonBan(target: Point): Boolean {
-        val differentColorExists = checkDifferentColorChessExists(target.x, target.y)
-        val midChessNum = countMidChessNum(target)
+    private fun checkCannonBan(targetX: Int, targetY: Int): Boolean {
+        val differentColorExists = checkDifferentColorChessExists(targetX, targetY)
+        val midChessNum = countMidChessNum(targetX, targetY)
 
         if (!differentColorExists && 0 == midChessNum) {
             // 中间没有棋子,也没用目标位置也没有棋子(有己方棋子的情况在canGo里面检查过了)
@@ -116,16 +116,16 @@ class Cannon internal constructor(g: Game, c: ChessColor, private val left: Bool
         val points = ArrayList<Point>()
         val move = ArrayList<Point>()
         for (mx in Settings.MIN_X..Settings.MAX_X + 1) {
-            if (mx != location.x)
-                move.add(Point(mx, location.y))
+            if (mx != this.x)
+                move.add(Point(mx, this.y))
         }
         for (my in Settings.MIN_Y..Settings.MAX_Y + 1) {
-            if (my != location.y)
-                move.add(Point(location.x, my))
+            if (my != this.y)
+                move.add(Point(this.x, my))
         }
         for (m in move) {
             if (checkInBoard(m.x, m.y) && !checkSameColorChessExists(m.x, m.y)) {
-                if (!checkCannonBan(m)) {
+                if (!checkCannonBan(m.x, m.y)) {
                     points.add(m)
                 }
             }

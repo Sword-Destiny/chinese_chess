@@ -4,7 +4,6 @@ import com.yuanhao.chinesechess.ai.Score
 import com.yuanhao.chinesechess.main.ChessColor
 import com.yuanhao.chinesechess.main.ChessMan
 import com.yuanhao.chinesechess.settings.Settings
-import java.awt.Point
 import java.io.Serializable
 
 /**
@@ -12,10 +11,11 @@ import java.io.Serializable
  * uc:用户棋子颜色
  * n:移动的棋子名字
  */
-class Step constructor(f: Point, t: Point, n: String, man: ChessMan, uc: ChessColor, rs: Double, bs: Double, e: Double) : Serializable {
-    val info: String // 走棋信息
-    val from: Point = f // 棋子原位置
-    val to: Point = t // 棋子新位置
+class Step constructor(fx: Int, fy: Int, tx: Int, ty: Int, man: ChessMan, rs: Double, bs: Double, e: Double) : Serializable {
+    val fromX: Int = fx // 棋子原位置
+    val fromY: Int = fy
+    val toX: Int = tx // 棋子新位置
+    val toY: Int = ty
     val chess = man // 棋子
     val redScore = rs // 此步走完之后红方棋面分数
     val blackScore = bs // 此步走完之后黑方棋面分数
@@ -23,13 +23,14 @@ class Step constructor(f: Point, t: Point, n: String, man: ChessMan, uc: ChessCo
     var differentKingWillDie = false // 是否将军
     var up = 0.0 // 局势变化增量,也就是棋面向自己胜利倾斜的程度
 
-    init {
-        val c = man.color
+    private fun info(): String {
+        val c = chess.color
+        val uc = chess.game.settings.userColor
         // 用户执黑坐标旋转
-        val fy = if (uc == ChessColor.RED) f.y else Settings.MAX_Y - f.y
-        val ty = if (uc == ChessColor.RED) t.y else Settings.MAX_Y - t.y
-        val fx = if (uc == ChessColor.RED) f.x else Settings.MAX_X - f.x
-        val tx = if (uc == ChessColor.RED) t.x else Settings.MAX_X - t.x
+        val fy = if (uc == ChessColor.RED) fromY else Settings.MAX_Y - fromY
+        val ty = if (uc == ChessColor.RED) toY else Settings.MAX_Y - toY
+        val fx = if (uc == ChessColor.RED) fromX else Settings.MAX_X - fromX
+        val tx = if (uc == ChessColor.RED) toX else Settings.MAX_X - toX
         // 判断动作为进,退或者平
         // 对于用户,以上为进,下为退
         // 对于电脑,以下为进,上为退
@@ -49,11 +50,10 @@ class Step constructor(f: Point, t: Point, n: String, man: ChessMan, uc: ChessCo
                 }
         val fsx = if (c == uc) user_numbers[fx] else computer_numbers[fx]
         val tsx = if (c == uc) user_numbers[tx] else computer_numbers[tx]
-        info =
-                if (fy == ty)
-                    "$n$fsx$action$tsx"
-                else
-                    "$n$fsx$action${Math.abs(fy - ty)}"
+        return if (fy == ty)
+            "${chess.name}$fsx$action$tsx"
+        else
+            "${chess.name}$fsx$action${Math.abs(fy - ty)}"
     }
 
     /**
@@ -92,6 +92,6 @@ class Step constructor(f: Point, t: Point, n: String, man: ChessMan, uc: ChessCo
     }
 
     override fun toString(): String {
-        return "${if (chess.color == ChessColor.RED) "红" else "黑"} : $info \t { (${from.x},${from.y}) -> (${to.x},${to.y}) }   ---   红方棋面得分: $redScore, 黑方棋面得分: $blackScore\n"
+        return "${if (chess.color == ChessColor.RED) "红" else "黑"} : ${info()} \t { ($fromX,$fromY) -> ($toX,$toY) }   ---   红方棋面得分: $redScore, 黑方棋面得分: $blackScore\n"
     }
 }

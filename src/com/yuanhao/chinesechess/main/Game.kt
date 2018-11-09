@@ -69,7 +69,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         status = GameStatus.PREPARE
         addChesses()
         init()
-        recorder = Recorder(numberMatrix(),this)
+        recorder = Recorder(numberMatrix(), this)
         userGo = FirstStep.USER == settings.firstStep
     }
 
@@ -137,7 +137,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         if (r == null) {
             return false
         }
-        if (r.location.x == x && r.location.y == y && c == ChessColor.BLACK) {
+        if (r.x == x && r.y == y && c == ChessColor.BLACK) {
             return false
         }
         var b: King? = null
@@ -150,23 +150,23 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
         if (b == null) {
             return false
         }
-        if (b.location.x == x && b.location.y == y && c == ChessColor.RED) {
+        if (b.x == x && b.y == y && c == ChessColor.RED) {
             return false
         }
-        if (r.location.x != b.location.x) {
+        if (r.x != b.x) {
             return false
         }
 
         for (man in redAliveChesses) {
             if (man !is King) {
-                if (LocationUtility.checkBetweenY(man.location, r.location, b.location)) {
+                if (LocationUtility.checkBetweenY(man.x, man.y, r.x, r.y, b.x, b.y)) {
                     return false
                 }
             }
         }
         for (man in blackAliveChesses) {
             if (man !is King) {
-                if (LocationUtility.checkBetweenY(man.location, r.location, b.location)) {
+                if (LocationUtility.checkBetweenY(man.x, man.y, r.x, r.y, b.x, b.y)) {
                     return false
                 }
             }
@@ -218,10 +218,10 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     private fun numberMatrix(): Array<Array<Int>> {
         val m = Array(Settings.MAX_X + 1) { Array(Settings.MAX_Y + 1) { 0 } }
         for (man in redAliveChesses) {
-            m[man.location.x][man.location.y] = man.matrixNumber()
+            m[man.x][man.y] = man.matrixNumber()
         }
         for (man in blackAliveChesses) {
-            m[man.location.x][man.location.y] = man.matrixNumber()
+            m[man.x][man.y] = man.matrixNumber()
         }
         return m
     }
@@ -251,10 +251,10 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     /**
      * 敌方已死亡的棋子
      */
-    fun getDifferentDeadChesses(color: ChessColor):ArrayList<ChessMan>{
-        return if(color==ChessColor.BLACK){
+    fun getDifferentDeadChesses(color: ChessColor): ArrayList<ChessMan> {
+        return if (color == ChessColor.BLACK) {
             redDeadChesses
-        }else{
+        } else {
             blackDeadChesses
         }
     }
@@ -274,7 +274,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
             return false
         }
         for (man in getDifferentColorChesses(c)) {
-            if (man.canGo(king.location.x, king.location.y)) {
+            if (man.canGo(king.x, king.y)) {
                 return true
             }
         }
@@ -287,7 +287,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
     fun checkGameOver(c: ChessColor): Boolean {
         for (man in getSameColorChesses(c)) {
             val locations = man.listAllLocationsCanGo()
-            val loc = Point(man.location.x, man.location.y)
+            val loc = Point(man.x, man.y)
             for (l in locations) {
                 man.setLocation(l.x, l.y)
                 val m = getDifferentExistsChess(l.x, l.y, c)
@@ -309,7 +309,7 @@ class Game @JvmOverloads constructor(val settings: Settings = Settings()) : Seri
      */
     fun getDifferentExistsChess(x: Int, y: Int, c: ChessColor): ChessMan? {
         for (man in getDifferentColorChesses(c)) {
-            if (man.location.x == x && man.location.y == y) {
+            if (man.x == x && man.y == y) {
                 return man
             }
         }

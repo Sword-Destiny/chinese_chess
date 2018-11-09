@@ -39,7 +39,7 @@ class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c =
         // 下一步能去的位置
         val move = arrayOf(intArrayOf(0, 1), intArrayOf(0, -1), intArrayOf(-1, 0), intArrayOf(1, 0))
         for (m in move) {
-            if (x == location.x + m[0] && y == location.y + m[1]) {
+            if (x == this.x + m[0] && y == this.y + m[1]) {
                 return true
             }
         }
@@ -50,7 +50,7 @@ class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c =
         val points = ArrayList<Point>()
         val move = arrayOf(intArrayOf(0, 1), intArrayOf(0, -1), intArrayOf(-1, 0), intArrayOf(1, 0))
         for (m in move) {
-            val p = Point(location.x + m[0], location.y + m[1])
+            val p = Point(this.x + m[0], this.y + m[1])
             if (checkInBoard(p.x, p.y) && !checkSameColorChessExists(p.x, p.y)) {
                 if (p.x >= 3 && p.y >= 0 && p.x <= 5 && p.y <= 2) {
                     if (color == ChessColor.RED) {

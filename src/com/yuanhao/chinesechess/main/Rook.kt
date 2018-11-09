@@ -11,24 +11,24 @@ import java.util.ArrayList
 /**
  * 车
  */
-class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "车", 500.0) {
+class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "车", 400.0) {
 
     override fun countStaticScore() {
         locationScore = 0.0
-        if(location.x in 3..5){
+        if (this.x in 3..5) {
             locationScore += 30
         }
-        if(location.y in 7..9 && color == ChessColor.RED){
+        if (this.y in 7..9 && color == ChessColor.RED) {
             locationScore += 30
         }
-        if(location.y in 0..2 && color == ChessColor.BLACK){
+        if (this.y in 0..2 && color == ChessColor.BLACK) {
             locationScore += 30
         }
         flexibilityScore = Score.BASIC_SCORE * listAllLocationsCanGo().size / 17.0
         safetyScore = 0.0
         for (man in game.getSameColorChesses(color)) {
             if (man != this) {
-                if (man.canGo(location.x, location.y)) {
+                if (man.canGo(this.x, this.y)) {
                     safetyScore += Score.SAFETY_RATE * (Score.BASIC_SCORE + locationScore)
                 }
             }
@@ -48,16 +48,16 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
         }
         val move = ArrayList<Point>()
         for (mx in Settings.MIN_X..Settings.MAX_X + 1) {
-            if (mx != location.x)
-                move.add(Point(mx, location.y))
+            if (mx != this.x)
+                move.add(Point(mx, this.y))
         }
         for (my in Settings.MIN_Y..Settings.MAX_Y + 1) {
-            if (my != location.y)
-                move.add(Point(location.x, my))
+            if (my != this.y)
+                move.add(Point(this.x, my))
         }
         for (m in move) {
             if (m.x == x && m.y == y) {
-                if (!checkRookBan(m)) {
+                if (!checkRookBan(m.x, m.y)) {
                     return true
                 }
             }
@@ -68,15 +68,15 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
     /**
      * 检查车和目标位置之间有没有被其他棋子挡住
      */
-    private fun checkRookBan(target: Point): Boolean {
+    private fun checkRookBan(targetX: Int, targetY: Int): Boolean {
         for (man in game.getSameColorChesses(color)) {
-            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
+            if (LocationUtility.checkBetweenXY(man.x, man.y, x, y, targetX, targetY)) {
                 return true
             }
         }
 
         for (man in game.getDifferentColorChesses(color)) {
-            if (LocationUtility.checkBetweenXY(man.location, location, target)) {
+            if (LocationUtility.checkBetweenXY(man.x, man.y, x, y, targetX, targetY)) {
                 return true
             }
         }
@@ -117,16 +117,16 @@ class Rook internal constructor(g: Game, c: ChessColor, private val left: Boolea
         val points = ArrayList<Point>()
         val move = ArrayList<Point>()
         for (mx in Settings.MIN_X..Settings.MAX_X + 1) {
-            if (mx != location.x)
-                move.add(Point(mx, location.y))
+            if (mx != this.x)
+                move.add(Point(mx, this.y))
         }
         for (my in Settings.MIN_Y..Settings.MAX_Y + 1) {
-            if (my != location.y)
-                move.add(Point(location.x, my))
+            if (my != this.y)
+                move.add(Point(this.x, my))
         }
         for (m in move) {
             if (checkInBoard(m.x, m.y) && !checkSameColorChessExists(m.x, m.y)) {
-                if (!checkRookBan(m)) {
+                if (!checkRookBan(m.x, m.y)) {
                     points.add(m)
                 }
             }

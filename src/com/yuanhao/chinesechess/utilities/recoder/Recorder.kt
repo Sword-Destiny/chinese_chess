@@ -34,8 +34,8 @@ class Recorder(matrix: Array<Array<Int>>, g: Game) : Serializable {
      */
     fun record(s: Step) {
         steps.add(s)
-        finalStatus[s.to.x][s.to.y] = finalStatus[s.from.x][s.from.y]
-        finalStatus[s.from.x][s.from.y] = 0
+        finalStatus[s.toX][s.toY] = finalStatus[s.fromX][s.fromY]
+        finalStatus[s.fromX][s.fromY] = 0
     }
 
     /**
@@ -60,18 +60,12 @@ class Recorder(matrix: Array<Array<Int>>, g: Game) : Serializable {
             return
         }
         val step = steps.last()
-        for (man in game.getSameColorChesses(step.chess.color)) {
-            if (man.location.x == step.to.x && man.location.y == step.to.y) {
-                man.setLocation(step.from.x, step.from.y)
-                finalStatus[step.from.x][step.from.y] = finalStatus[step.to.x][step.to.y]
-                break
-            }
-        }
-        for (man in game.getDifferentDeadChesses(step.chess.color)) {
-            if (man.location.x == step.to.x && man.location.y == step.to.y) {
-                man.alive()
-                finalStatus[step.to.x][step.to.y] = man.matrixNumber()
-                break
+        step.chess.setLocation(step.fromX, step.fromY)
+        val differentChesses = game.getDifferentDeadChesses(step.chess.color)
+        if (differentChesses.isNotEmpty()) {
+            val last = differentChesses.last()
+            if (last.x == step.toX && last.y == step.toY) {
+                last.alive()
             }
         }
         game.userGo = !game.userGo
@@ -91,13 +85,11 @@ class Recorder(matrix: Array<Array<Int>>, g: Game) : Serializable {
      */
     fun applyStep(s: Step) {
         game.userGo = !game.userGo
-        finalStatus[s.to.x][s.to.y] = finalStatus[s.from.x][s.from.y]
-        finalStatus[s.from.x][s.from.y] = 0
         game.redScore = s.redScore
         game.blackScore = s.blackScore
-        s.chess.setLocation(s.to.x, s.to.y)
+        s.chess.setLocation(s.toX, s.toY)
         for (man in game.getDifferentColorChesses(s.chess.color)) {
-            if (man.location.x == s.to.x && man.location.y == s.to.y) {
+            if (man.x == s.toX && man.y == s.toY) {
                 man.die()
                 break
             }
@@ -110,7 +102,7 @@ class Recorder(matrix: Array<Array<Int>>, g: Game) : Serializable {
         s += ArrayUtility.outputArray2D(initStatus, 2)
         s += "走棋过程:\n"
         for (step in steps) {
-            s += step.toString()
+            s += step.toString() + "\n"
         }
         s += "最终状态矩阵:\n"
         s += ArrayUtility.outputArray2D(finalStatus, 2)

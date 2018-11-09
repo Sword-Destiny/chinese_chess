@@ -10,14 +10,14 @@ import java.util.ArrayList
 /**
  * 士
  */
-class Queen internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "士", 100.0) {
+class Queen internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, "士", 150.0) {
     override fun countStaticScore() {
         locationScore = 0.0
         flexibilityScore = Score.BASIC_SCORE * listAllLocationsCanGo().size / 4.0
         safetyScore = 0.0
         for (man in game.getSameColorChesses(color)){
             if(man != this){
-                if(man.canGo(location.x,location.y)){
+                if(man.canGo(this.x,this.y)){
                     safetyScore += Score.SAFETY_RATE * Score.BASIC_SCORE
                 }
             }
@@ -61,7 +61,7 @@ class Queen internal constructor(g: Game, c: ChessColor, private val left: Boole
         }
         val move = arrayOf(intArrayOf(1, 1), intArrayOf(1, -1), intArrayOf(-1, 1), intArrayOf(-1, -1))
         for (m in move) {
-            if (x == location.x + m[0] && y == location.y + m[1]) {
+            if (x == this.x + m[0] && y == this.y + m[1]) {
                 return true
             }
         }
@@ -88,7 +88,7 @@ class Queen internal constructor(g: Game, c: ChessColor, private val left: Boole
         val points = ArrayList<Point>()
         val move = arrayOf(intArrayOf(1, 1), intArrayOf(1, -1), intArrayOf(-1, 1), intArrayOf(-1, -1))
         for (m in move) {
-            val p = Point(location.x + m[0], location.y + m[1])
+            val p = Point(this.x + m[0], this.y + m[1])
             if (checkInBoard(p.x, p.y) && !checkSameColorChessExists(p.x, p.y)) {
                 if (p.x >= 3 && p.y >= 0 && p.x <= 5 && p.y <= 2) {
                     if (color == ChessColor.RED) {
