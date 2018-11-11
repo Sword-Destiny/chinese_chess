@@ -11,7 +11,7 @@ import java.io.Serializable
  * uc:用户棋子颜色
  * n:移动的棋子名字
  */
-class Step constructor(fx: Int, fy: Int, tx: Int, ty: Int, man: ChessMan, rs: Double, bs: Double, e: Double) : Serializable {
+class Step constructor(fx: Int, fy: Int, tx: Int, ty: Int, man: ChessMan, rs: Double, bs: Double, e: Double, pre: Step?) : Serializable {
     val fromX: Int = fx // 棋子原位置
     val fromY: Int = fy
     val toX: Int = tx // 棋子新位置
@@ -22,6 +22,9 @@ class Step constructor(fx: Int, fy: Int, tx: Int, ty: Int, man: ChessMan, rs: Do
     val eatScore = Score.EAT_FACTOR * e // 吃子得分
     var differentKingWillDie = false // 是否将军
     var up = 0.0 // 局势变化增量,也就是棋面向自己胜利倾斜的程度
+
+    var nextSteps: ArrayList<Step>? = null // 后续步
+    val preStep = pre // 前一步
 
     private fun info(): String {
         val c = chess.color
