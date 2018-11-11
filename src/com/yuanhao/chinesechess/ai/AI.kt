@@ -18,7 +18,6 @@ import kotlin.random.Random
  * 因此对手的策略很重要,对手下棋也是要冲着获胜去的,不是每种情况概率都一样.
  *
  * NOTICE: 如果遇到动态局面应该加深搜索层数,直到静态局面出现为止(需要考虑连续将军怎么处理,这个有可能是无穷的步数)
- *
  */
 class AI(ps: Int = 3) : Serializable {
 
@@ -26,7 +25,7 @@ class AI(ps: Int = 3) : Serializable {
 
     /**
      * 棋风侵略性
-     * 1代表平衡,大于1代表以削减对方棋面分数为主,也就是以进攻为主,小于1即代表保守
+     * 1代表平衡,大于1代表以削减对方棋面分数为主,也就是以进攻为主,小于1即代表保守,保守就是更倾向于步步为营扩大自己优势
      */
     private var computerAggressive = 0.98
 
@@ -277,7 +276,8 @@ class AI(ps: Int = 3) : Serializable {
     }
 
     /**
-     * 学习用户的侵略性
+     * 学习用户的棋风侵略性
+     * NOTICE:在这个函数里面修改可以一定程度上改变电脑的风格
      */
     fun learnUserAggressive(g: Game) {
         if (g.recorder.steps.size < 2) {
@@ -290,15 +290,17 @@ class AI(ps: Int = 3) : Serializable {
         val youUp = s.getDifferentColorScore(s.chess.color) - sp.getDifferentColorScore(s.chess.color)
         if (meUp >= 0.0 && youUp >= 0.0) {
             nConservative++
+            nStep++
         }
         if (meUp < 0.0 && youUp < 0.0) {
             nRadical++
+            nStep++
         }
-        if (nConservative > 0 && nRadical > 0) {
-            userAggressive = nRadical.toDouble() / nConservative.toDouble()
-        }
-        if (nStep >= predictSteps) {
-            // 将电脑的激进程度设置为像用户接近,针尖对麦芒,人类容易犯错
+        if (nStep >= predictSteps * 2) {
+            val r = if (nRadical > 0) nRadical else 1
+            val c = if (nConservative > 0) nConservative else 1
+            userAggressive = r.toDouble() / c.toDouble()
+            // 将电脑的激进程度设置为逐渐向用户接近,对弈过程中,针尖对麦芒,人类更容易犯错
             computerAggressive = (computerAggressive + userAggressive) / 2.0
         }
     }

@@ -169,6 +169,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         println(s)
         game.recode(s)
         if (!game.userGo) {
+            // 为什么这里是 !game.userGo,因为在前面有一句game.userGo = !game.userGo
             game.ai.learnUserAggressive(game)
         }
     }
@@ -230,7 +231,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
 
     /**
      * 计算最终得分,包含威胁性得分
-     * 此函数可以迭代
+     * NOTICE: 此函数可以迭代,但不要迭代太多次,否则两个互相威胁的棋子得分会无止境的增加
      */
     fun countScore() {
         threatScore = 0.0
