@@ -3,7 +3,7 @@ package com.yuanhao.chinesechess.ai
 import com.yuanhao.chinesechess.main.ChessColor
 import com.yuanhao.chinesechess.main.ChessMan
 import com.yuanhao.chinesechess.main.Game
-import com.yuanhao.chinesechess.utilities.recoder.Saver
+import com.yuanhao.chinesechess.utilities.common.CloneUtility
 import com.yuanhao.chinesechess.utilities.recoder.Step
 import java.awt.Point
 import java.io.Serializable
@@ -46,20 +46,15 @@ class AI(ps: Int = 3) : Serializable {
      * 开始AI分析
      */
     fun startAnalysis(g: Game): Step? {
-        val file = Saver.saveGame(g, Saver.TEMP_DATA, Saver.TEMP_TEXT)
-        if (file != null) {
-            val game = Saver.loadGame(file)
-            if (game != null) {
-                // 上面两步序列化和反序列化的操作其实就是为了复制game并且备份
-                // 下面开始 AI 分析
-                val goColor = if (game.userGo) game.settings.userColor else game.settings.computerColor
-                bfs(game, goColor, predictSteps)
-                val step = decideStep()
-                step1s.clear()
-                stepNs.clear()
-                Saver.deleteTempFile()
-                return step
-            }
+        // 将序列化为临时文件改为内存中的字节流序列化,也可以达到复制的目的
+        val game = CloneUtility.clone(g)
+        if (game != null) {
+            val goColor = if (game.userGo) game.settings.userColor else game.settings.computerColor
+            bfs(game, goColor, predictSteps)
+            val step = decideStep()
+            step1s.clear()
+            stepNs.clear()
+            return step
         }
         return null
     }

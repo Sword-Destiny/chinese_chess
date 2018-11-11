@@ -4,7 +4,6 @@ import com.yuanhao.chinesechess.main.Game
 import com.yuanhao.chinesechess.main.GameStatus
 import com.yuanhao.chinesechess.settings.Settings
 import com.yuanhao.chinesechess.utilities.common.LocationUtility
-import com.yuanhao.chinesechess.utilities.recoder.Saver
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.lang.Exception
@@ -238,7 +237,6 @@ class MainFrame : JFrame() {
     private fun stopAIThread() {
         userGoWithoutAi = true
         aiThread?.stop()
-        Saver.deleteTempFile()
         println("ai thread stop")
     }
 

@@ -71,7 +71,7 @@ class Saver {
                 }
 
             } catch (e: Exception) {
-                println(e.message)
+                println("删除临时文件出错: " + e.message)
             }
         }
     }
