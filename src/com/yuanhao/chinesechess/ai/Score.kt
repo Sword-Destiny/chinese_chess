@@ -34,7 +34,7 @@ class Score {
         /**
          * 获胜局面
          */
-        const val WIN = 1000000.0
+        const val WIN = 5000000.0
 
         /**
          * 吃子得分因子

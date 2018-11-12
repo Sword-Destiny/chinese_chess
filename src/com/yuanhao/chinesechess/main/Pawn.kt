@@ -9,7 +9,7 @@ import java.util.ArrayList
 /**
  * 兵卒
  */
-class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, if (c == ChessColor.RED) "兵" else "卒", 100.0) {
+class Pawn internal constructor(g: Game, c: ChessColor, private val index: Int) : ChessMan(g, c, if (c == ChessColor.RED) "兵" else "卒", 500.0) {
 
     override fun countStaticScore() {
         locationScore = 0.0

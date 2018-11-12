@@ -18,6 +18,8 @@ import kotlin.random.Random
  * 越有可能的局面权重越大,其中哪种局面可能性比较大呢,那要看对方的局面判断了,
  * 因此对手的策略很重要,对手下棋也是要冲着获胜去的,不是每种情况概率都一样.
  *
+ * TODO: 静态局面的搜索深度还不够
+ *
  * NOTICE: 如果遇到动态局面应该加深搜索层数,直到静态局面出现为止(需要考虑连续将军怎么处理,这个有可能是无穷的步数)
  *
  * TODO 加入将军历史表,如果遇到完全相同的将军,就不分析了,或者加入历史表,这样能解决反复走相同棋着的问题
@@ -86,11 +88,11 @@ class AI(ps: Int = 3) : Serializable {
         if (step1s[0].getSameColorScore(aiColor) < Score.WIN) {
             var s = 0.0
             val size = if (randomSize <= step1s.size) randomSize else step1s.size
-            for (i in 0..size) {
+            for (i in 0..(size - 1)) {
                 s += step1s[i].aiAverageUp
             }
             var d = random.nextDouble(s)
-            for (i in 0..size) {
+            for (i in 0..(size - 1)) {
                 d -= step1s[i].aiAverageUp
                 if (d <= 0) {
                     return step1s[i]
@@ -155,6 +157,10 @@ class AI(ps: Int = 3) : Serializable {
      */
     private fun computeAverageUp(pre: Step, aiColor: ChessColor) {
         val next = pre.nextSteps!!
+        if (next.size < 1) {
+            System.err.println("不应该出现这个情况")
+            return
+        }
 
         if (pre.chess.color == aiColor) {
             // 前一步是ai走的,这一步是用户走的,所以只有userAverageUP大于0的用户才有可能会走,如果没有大于0的,那么说明这一步用户的情况很不妙
@@ -165,20 +171,20 @@ class AI(ps: Int = 3) : Serializable {
                 return
             }
             // 在所有用户可能走的棋着上求概率平均
-            var aiS = 0.0
             var userS = 0.0
             for (s in next) {
                 if (s.userAverageUp > 0) {
-                    aiS += s.aiAverageUp
                     userS += s.userAverageUp
                 }
             }
             for (s in next) {
                 if (s.userAverageUp > 0) {
-                    pre.aiAverageUp += s.aiAverageUp * s.aiAverageUp / aiS
+                    pre.aiAverageUp += s.aiAverageUp * s.userAverageUp / userS
                     pre.userAverageUp += s.userAverageUp * s.userAverageUp / userS
                 }
             }
+            pre.aiAverageUp += pre.myUp / 3
+            pre.userAverageUp += pre.yourUp / 3
         } else {
             sortByAverageUp(next, true)
             if (next[0].aiAverageUp <= 0) {
@@ -187,19 +193,19 @@ class AI(ps: Int = 3) : Serializable {
                 return
             }
             var aiS = 0.0
-            var userS = 0.0
             for (s in next) {
                 if (s.aiAverageUp > 0) {
                     aiS += s.aiAverageUp
-                    userS += s.userAverageUp
                 }
             }
             for (s in next) {
                 if (s.aiAverageUp > 0) {
                     pre.aiAverageUp += s.aiAverageUp * s.aiAverageUp / aiS
-                    pre.userAverageUp += s.userAverageUp * s.userAverageUp / userS
+                    pre.userAverageUp += s.userAverageUp * s.aiAverageUp / aiS
                 }
             }
+            pre.aiAverageUp += pre.yourUp / 3
+            pre.userAverageUp += pre.myUp / 3
         }
     }
 
@@ -325,11 +331,11 @@ class AI(ps: Int = 3) : Serializable {
             nStep++
         }
         if (nStep >= predictSteps * 2) {
-            val r = if (nRadical > 0) nRadical else 1
-            val c = if (nConservative > 0) nConservative else 1
-            userAggressive = r.toDouble() / c.toDouble()
+            // val r = if (nRadical > 0) nRadical else 1
+            // val c = if (nConservative > 0) nConservative else 1
+            // userAggressive = r.toDouble() / c.toDouble()
             // 将电脑的激进程度设置为逐渐向用户接近,对弈过程中,针尖对麦芒,人类更容易犯错
-            computerAggressive = (computerAggressive + userAggressive) / 2.0
+            // computerAggressive = (computerAggressive + userAggressive) / 2.0
         }
     }
 

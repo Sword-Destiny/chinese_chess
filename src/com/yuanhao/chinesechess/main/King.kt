@@ -10,7 +10,7 @@ import java.util.ArrayList
 /**
  * 将，帅
  */
-class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c == ChessColor.RED) "帅" else "将", 10000.0) {
+class King internal constructor(g: Game, c: ChessColor) : ChessMan(g, c, if (c == ChessColor.RED) "帅" else "将", 50000.0) {
 
     override fun countStaticScore() {
         locationScore = 0.0

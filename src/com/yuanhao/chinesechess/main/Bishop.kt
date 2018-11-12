@@ -10,7 +10,7 @@ import java.util.ArrayList
 /**
  * 相，象
  */
-class Bishop internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, if (c == ChessColor.RED) "相" else "象", 150.0) {
+class Bishop internal constructor(g: Game, c: ChessColor, private val left: Boolean) : ChessMan(g, c, if (c == ChessColor.RED) "相" else "象", 750.0) {
 
     override fun countStaticScore() {
         // 相,象  最好还是靠近中间
