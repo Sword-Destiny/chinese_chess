@@ -164,7 +164,7 @@ abstract class ChessMan internal constructor(val game: Game, val color: ChessCol
         setLocation(x, y)
         lastGo = true
         game.userGo = !game.userGo
-        Score.countChessScores(game)
+        Score.countChessScores(game, false)
         val s = Step(p.x, p.y, x, y, this, game.redScore, game.blackScore, eatScore)
         println(s)
         game.recode(s)

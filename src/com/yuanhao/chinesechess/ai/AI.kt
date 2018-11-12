@@ -12,7 +12,8 @@ import kotlin.random.Random
 /**
  * AI 分析,使用打分机制,结合搜索,求最优局面,初始目标大概分析6步左右
  *
- * TODO:考虑对手的策略
+ * NOTICE: 考虑对手的策略
+ *
  * NOTICE: 静态局面的打分才是有意义的,动态局面的打分应该是后续静态局面打分的加权平均,
  * 越有可能的局面权重越大,其中哪种局面可能性比较大呢,那要看对方的局面判断了,
  * 因此对手的策略很重要,对手下棋也是要冲着获胜去的,不是每种情况概率都一样.
@@ -47,7 +48,6 @@ class AI(ps: Int = 3) : Serializable {
 
     companion object {
         private val random = Random(System.currentTimeMillis()) // 随机数
-        private const val MAX_STEPS = 200 // 为了性能考虑,只保留200种情况,注意,这个数还是很大,在两步发散后,可能就会变成100000种
     }
 
     /**
@@ -58,10 +58,9 @@ class AI(ps: Int = 3) : Serializable {
         val game = CloneUtility.clone(g)
         if (game != null) {
             val goColor = if (game.userGo) game.settings.userColor else game.settings.computerColor
-            bfs(game, goColor, predictSteps)
-            val step = decideStep()
+            dfs(g, goColor)
+            val step = decideStep(goColor)
             step1s.clear()
-            stepNs.clear()
             return step
         }
         return null
@@ -70,116 +69,136 @@ class AI(ps: Int = 3) : Serializable {
     /**
      * 用于统计局势情况,往局势优的方向走棋
      */
-    private val step1s = HashMap<Step, com.yuanhao.chinesechess.utilities.common.Pair<Int, Double>>()
-    /**
-     * 按照棋面价值进行排序,保留最好的MAX_STEP个情况
-     */
-    private var stepNs = ArrayList<Pair<Step, ArrayList<Step>>>()
+    private var step1s = ArrayList<Step>()
 
     /**
      * 最终决定走哪一步棋
-     * TODO 判断一步棋的分数,还要看下一步棋可能的情况,情况越少的,权重越高
+     * 如果有胜局就不随机,否则就随机选择一个比较好的,当然还是分数越高概率越大
      */
-    private fun decideStep(): Step? {
-        for (pair in stepNs) {
-            step1s[pair.first]!!.first++
-            step1s[pair.first]!!.second += pair.second.last().up
-        }
-        val finalScore = ArrayList<Pair<Step, Double>>()
-        step1s.forEach { k, v -> if (v.first > 0) finalScore.add(Pair(k, v.second / v.first.toDouble())) }
-        finalScore.sortWith(Comparator { s1, s2 -> return@Comparator if (s1.second > s2.second) -1 else if (s1.second < s2.second) 1 else 0 })
-        if (finalScore.size > 0) {
-            if (finalScore.size > randomSize) {
-                if (finalScore[0].first.getSameColorScore(finalScore[0].first.chess.color) >= Score.WIN) {
-                    // 胜局不随机
-                    return finalScore[0].first
-                }
-                // 其他情况适当随机一下
-                val r = random.nextInt(randomSize)
-                return finalScore[r].first
-            } else {
-                return finalScore[0].first
-            }
-        } else {
+    private fun decideStep(aiColor: ChessColor): Step? {
+        sortByAverageUp(step1s, true)
+        if (step1s.size < 1) {
             return null
         }
+        if (step1s[0].aiAverageUp <= 0.0) {
+            return step1s[0]
+        }
+        if (step1s[0].getSameColorScore(aiColor) < Score.WIN) {
+            var s = 0.0
+            val size = if (randomSize <= step1s.size) randomSize else step1s.size
+            for (i in 0..size) {
+                s += step1s[i].aiAverageUp
+            }
+            var d = random.nextDouble(s)
+            for (i in 0..size) {
+                d -= step1s[i].aiAverageUp
+                if (d <= 0) {
+                    return step1s[i]
+                }
+            }
+        }
+        return step1s[0]
     }
 
-    /**
-     * 宽度优先搜索
-     */
-    private fun bfs(g: Game, c: ChessColor, ps: Int) {
+    private fun dfs(g: Game, aiColor: ChessColor) {
         val last = if (g.recorder.steps.isNotEmpty()) g.recorder.steps.last() else null
-        val steps = listAllLocationCanGo(g, c)
-        for (s in steps) {
-            computeUp(s, last, g, c)
-        }
-        for (s in steps) {
-            step1s[s] = com.yuanhao.chinesechess.utilities.common.Pair(0, 0.0)
-        }
-        for (s in steps) {
-            stepNs.add(Pair(s, ArrayList()))
-        }
-        var nStep = ps
-        var cc = c
-
-        while (nStep > 0) {
-            var tmp = ArrayList<Pair<Step, ArrayList<Step>>>()
-            analysisAStep(tmp, g, c, cc, last) // 分析己方一步
-            stepNs.clear()
-            stepNs = tmp
-            cc = if (cc == ChessColor.RED) ChessColor.BLACK else ChessColor.RED
-            tmp = ArrayList()
-            analysisAStep(tmp, g, c, cc, last) // 分析对方一步
-            stepNs.clear()
-            stepNs = tmp
-            cc = if (cc == ChessColor.RED) ChessColor.BLACK else ChessColor.RED
-            // 通过局势变化增量来进行剪枝
-            if (stepNs.size > MAX_STEPS) {
-                sortByUp(stepNs)
-                stepNs.subList(MAX_STEPS, stepNs.size).clear()
+        step1s = listAllLocationCanGo(g, aiColor)
+        for (s in step1s) {
+            computeUp(s, last, g)
+            // TODO 判断历史
+            if (s.isStaticStep()) {
+                s.aiAverageUp = if (s.chess.color == aiColor) s.myUp else s.yourUp
+                s.userAverageUp = if (s.chess.color == aiColor) s.yourUp else s.myUp
+            } else {
+                g.recorder.applyStep(s)
+                dfs(s, g, aiColor)
+                g.recorder.cancel()
+                computeAverageUp(s, aiColor)
             }
-            nStep--
         }
+    }
 
+    private fun dfs(pre: Step, g: Game, aiColor: ChessColor) {
+        pre.nextSteps = listAllLocationCanGo(g, if (pre.chess.color == ChessColor.RED) ChessColor.BLACK else ChessColor.RED)
+        if (pre.nextSteps == null || pre.nextSteps!!.isEmpty()) {
+            if (pre.chess.color == ChessColor.RED) {
+                pre.redScore = Score.WIN
+                pre.blackScore = 0.0
+            } else {
+                pre.redScore = 0.0
+                pre.blackScore = Score.WIN
+            }
+            // NOTICE 胜局和死局
+            pre.aiAverageUp = if (pre.chess.color == aiColor) pre.myUp else pre.yourUp
+            pre.userAverageUp = if (pre.chess.color == aiColor) pre.yourUp else pre.myUp
+        }
+        for (s in pre.nextSteps!!) {
+            computeUp(s, pre, g)
+            // TODO 判断历史
+            if (s.isStaticStep()) {
+                s.aiAverageUp = if (s.chess.color == aiColor) s.myUp else s.yourUp
+                s.userAverageUp = if (s.chess.color == aiColor) s.yourUp else s.myUp
+            } else {
+                g.recorder.applyStep(s)
+                dfs(s, g, aiColor)
+                g.recorder.cancel()
+                computeAverageUp(s, aiColor)
+            }
+        }
     }
 
     /**
-     * 分析一步
-     * c:电脑颜色
-     * cc:当前走棋颜色
+     * 这个地方是根据后续步骤的评分来决定当前步骤的评分,
+     * 后续步骤的up越大,选择走这一步的概率越大,
+     * 所以这里要分清楚这一步是自己走的还是对方走的,是AI走的还是用户走的.
+     * 对手不傻,只有对手觉得比较好的走法他才会走.
      */
-    private fun analysisAStep(tmp: ArrayList<Pair<Step, ArrayList<Step>>>, g: Game, c: ChessColor, cc: ChessColor, last: Step?) {
-        for (pair in stepNs) {
-            for (s in pair.second) {
-                g.recorder.applyStep(s)
+    private fun computeAverageUp(pre: Step, aiColor: ChessColor) {
+        val next = pre.nextSteps!!
+
+        if (pre.chess.color == aiColor) {
+            // 前一步是ai走的,这一步是用户走的,所以只有userAverageUP大于0的用户才有可能会走,如果没有大于0的,那么说明这一步用户的情况很不妙
+            sortByAverageUp(next, false)
+            if (next[0].userAverageUp <= 0) {
+                pre.aiAverageUp = next[0].aiAverageUp
+                pre.userAverageUp = next[0].userAverageUp
+                return
             }
-            val next = listAllLocationCanGo(g, cc)
-            if (c != cc) {
-                /**
-                 * TODO:对手的走棋不是随便的,选择最有可能的3-5步棋
-                 */
-            }
-            if (next.size == 0) {
-                if (c != cc) {
-                    /**
-                     * TODO 胜局
-                     */
-                } else {
-                    /**
-                     * TODO 死局
-                     */
+            // 在所有用户可能走的棋着上求概率平均
+            var aiS = 0.0
+            var userS = 0.0
+            for (s in next) {
+                if (s.userAverageUp > 0) {
+                    aiS += s.aiAverageUp
+                    userS += s.userAverageUp
                 }
             }
             for (s in next) {
-                computeUp(s, last, g, c)
-                val list = ArrayList<Step>()
-                list.addAll(pair.second)
-                list.add(s)
-                tmp.add(Pair(pair.first, list))
+                if (s.userAverageUp > 0) {
+                    pre.aiAverageUp += s.aiAverageUp * s.aiAverageUp / aiS
+                    pre.userAverageUp += s.userAverageUp * s.userAverageUp / userS
+                }
             }
-            for (s in pair.second) {
-                g.recorder.cancel()
+        } else {
+            sortByAverageUp(next, true)
+            if (next[0].aiAverageUp <= 0) {
+                pre.aiAverageUp = next[0].aiAverageUp
+                pre.userAverageUp = next[0].userAverageUp
+                return
+            }
+            var aiS = 0.0
+            var userS = 0.0
+            for (s in next) {
+                if (s.aiAverageUp > 0) {
+                    aiS += s.aiAverageUp
+                    userS += s.userAverageUp
+                }
+            }
+            for (s in next) {
+                if (s.aiAverageUp > 0) {
+                    pre.aiAverageUp += s.aiAverageUp * s.aiAverageUp / aiS
+                    pre.userAverageUp += s.userAverageUp * s.userAverageUp / userS
+                }
             }
         }
     }
@@ -220,7 +239,7 @@ class AI(ps: Int = 3) : Serializable {
         val p = Point(chess.x, chess.y)
         chess.setLocation(x, y)
         g.userGo = !g.userGo
-        Score.countChessScores(g)
+        Score.countChessScores(g, true)
         val s = Step(p.x, p.y, x, y, chess, g.redScore, g.blackScore, eatScore)
         g.recorder.steps.add(s)
     }
@@ -228,27 +247,20 @@ class AI(ps: Int = 3) : Serializable {
     /**
      * 通过局势变化增量来排序
      */
-    private fun sortByUp(steps: ArrayList<Pair<Step, ArrayList<Step>>>) {
+    private fun sortByAverageUp(steps: ArrayList<Step>, ai: Boolean) {
         steps.sortWith(Comparator { o1, o2 ->
-            val last1 = o1.second.last()
-            val last2 = o2.second.last()
-            if (last1.differentKingWillDie || last2.differentKingWillDie) {
+            if (ai) {
                 when {
-                    last1.up > last2.up -> return@Comparator -1
-                    last1.up < last2.up -> return@Comparator 1
+                    o1.aiAverageUp > o2.aiAverageUp -> return@Comparator -1
+                    o1.aiAverageUp < o2.aiAverageUp -> return@Comparator 1
                     else -> return@Comparator 0
                 }
-            }
-            if (last1.isStaticStep() && !last2.isStaticStep()) {
-                return@Comparator 1
-            }
-            if (!last1.isStaticStep() && last2.isStaticStep()) {
-                return@Comparator -1
-            }
-            when {
-                last1.up > last2.up -> return@Comparator -1
-                last1.up < last2.up -> return@Comparator 1
-                else -> return@Comparator 0
+            } else {
+                when {
+                    o1.userAverageUp > o2.userAverageUp -> return@Comparator -1
+                    o1.userAverageUp < o2.userAverageUp -> return@Comparator 1
+                    else -> return@Comparator 0
+                }
             }
         })
     }
@@ -256,25 +268,39 @@ class AI(ps: Int = 3) : Serializable {
     /**
      * 计算局势变化增量
      */
-    private fun computeUp(step: Step, preStep: Step?, g: Game, c: ChessColor): Double {
-        var meUp = step.getSameColorScore(c) - (preStep?.getSameColorScore(c) ?: 0.0)
+    private fun computeUp(step: Step, preStep: Step?, g: Game) {
+        val c = step.chess.color
+        val meUp = step.getSameColorScore(c) - (preStep?.getSameColorScore(c) ?: 0.0)
         val youUp = step.getDifferentColorScore(c) - (preStep?.getDifferentColorScore(c)
                 ?: 0.0)
-        if (step.chess.color == g.settings.computerColor) {
+        val myUp = if (c == g.settings.computerColor) {
             if (meUp >= 0.0) {
-                meUp *= computerAggressive
+                meUp * computerAggressive
             } else {
-                meUp /= computerAggressive
+                meUp / computerAggressive
             }
         } else {
             if (meUp >= 0.0) {
-                meUp *= userAggressive
+                meUp * userAggressive
             } else {
-                meUp /= userAggressive
+                meUp / userAggressive
             }
         }
-        step.up = meUp - youUp
-        return step.up
+        val yourUp = if (c == g.settings.computerColor) {
+            if (youUp >= 0.0) {
+                youUp * userAggressive
+            } else {
+                youUp / userAggressive
+            }
+        } else {
+            if (youUp >= 0.0) {
+                youUp * computerAggressive
+            } else {
+                youUp / computerAggressive
+            }
+        }
+        step.myUp = myUp - youUp
+        step.yourUp = yourUp - meUp
     }
 
     /**
@@ -306,80 +332,5 @@ class AI(ps: Int = 3) : Serializable {
             computerAggressive = (computerAggressive + userAggressive) / 2.0
         }
     }
-
-//    /**
-//     * 有价值的棋着
-//     */
-//    private val betterSteps = ArrayList<Pair<Step, Step>>()
-//    /**
-//     * 静态棋着
-//     */
-//    private val staticSteps = ArrayList<Pair<Step, Step>>()
-//    /**
-//     * 所有棋着
-//     */
-//    private val allSteps = ArrayList<Pair<Step, Step>>()
-//
-//    /**
-//     * 深度优先搜索函数
-//     */
-//    private fun searchStep(g: Game, c: ChessColor, ps: Int, preStep: Step?) {
-//        if (ps <= 0) {
-//            return
-//        }
-//        if (preStep == null) {
-//            staticSteps.clear()
-//            betterSteps.clear()
-//            allSteps.clear()
-//        }
-//        if (g.checkKingWillDie(c)) {
-//            return
-//        }
-//        val steps = listAllLocationCanGo(g, c)
-//        findStaticSteps(steps, preStep)
-//        findBetterSteps(g, steps, preStep)
-//        for (step in steps) {
-//            g.recorder.applyStep(step)
-//            searchStep(g, if (c == ChessColor.RED) ChessColor.BLACK else ChessColor.RED, ps - 1, preStep ?: step)
-//            g.recorder.cancel()
-//        }
-//    }
-//
-//    /**
-//     * 寻找变稳定的局势
-//     */
-//    private fun findStaticSteps(steps: ArrayList<Step>, preStep: Step?) {
-//        for (step in steps) {
-//            val go = preStep ?: step
-//            allSteps.add(Pair(go, step))
-//            if (step.isStaticStep()) {
-//                staticSteps.add(Pair(go, step))
-//            }
-//        }
-//    }
-//
-//    /**
-//     * 寻找变优的局势
-//     */
-//    private fun findBetterSteps(g: Game, steps: ArrayList<Step>, preStep: Step?) {
-//        if (g.recorder.steps.isNotEmpty()) {
-//            val last = g.recorder.lastStep()
-//            for (step in steps) {
-//                if (step.isStaticStep()) {
-//                    if (preStep != null) {
-//                        val up = computeUp(step, preStep, g)
-//                        if (up > 0.0) {
-//                            betterSteps.add(Pair(preStep, step))
-//                        }
-//                    } else {
-//                        val up = computeUp(step, last, g)
-//                        if (up > 0.0) {
-//                            betterSteps.add(Pair(step, step))
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
 }

@@ -5,6 +5,7 @@ import com.yuanhao.chinesechess.main.Game
 
 /**
  * 计分系统
+ * TODO 胜局计分的时候,离胜利越近,得分越高
  */
 class Score {
     companion object {
@@ -17,7 +18,7 @@ class Score {
 
         /**
          * 威胁性因子
-         * TODO 当一个棋子可以走到对方棋子的位置的时候,就产生威胁性,威胁性要考虑对方的棋子被保护的情况,目前还没有考虑
+         * NOTICE: 当一个棋子可以走到对方棋子的位置的时候,就产生威胁性,威胁性要考虑对方的棋子被保护的情况,目前还没有考虑
          * 当然即使棋子处于被保护的状态,依然是可以威胁的,威胁不等于就要吃掉
          */
         const val THREAT_RATE = 0.2
@@ -44,53 +45,53 @@ class Score {
         /**
          * 计算所有棋子的分数
          */
-        fun countChessScores(game:Game) {
+        fun countChessScores(game: Game, ai: Boolean) {
 
-            for (man in game.redAliveChesses){
+            for (man in game.redAliveChesses) {
                 man.countStaticScore()
             }
 
-            for (man in game.blackAliveChesses){
+            for (man in game.blackAliveChesses) {
                 man.countStaticScore()
             }
 
-            for (man in game.redAliveChesses){
+            for (man in game.redAliveChesses) {
                 man.countScore()
             }
 
-            for (man in game.blackAliveChesses){
+            for (man in game.blackAliveChesses) {
                 man.countScore()
             }
 
-            countBasicScore(game)
+            countBasicScore(game, ai)
         }
 
         /**
          * 计算当前棋面得分
          */
-        private fun countBasicScore(game: Game) {
+        private fun countBasicScore(game: Game, ai: Boolean) {
             game.redScore = 0.0
             game.blackScore = 0.0
             val c = game.getGoColor()
             if (c == ChessColor.BLACK) {
-                if (game.checkKingWillDie(ChessColor.BLACK)) {
+                if (!ai && game.checkGameOver(ChessColor.BLACK)) {
                     // 黑方死局
                     game.redScore = WIN
                     game.blackScore = 0.0
                     return
                 } else {
-                    if(game.recorder.steps.isNotEmpty()) {
+                    if (game.recorder.steps.isNotEmpty()) {
                         game.redScore += game.recorder.lastStep().eatScore
                     }
                 }
             } else {
-                if (game.checkKingWillDie(ChessColor.RED)) {
+                if (!ai && game.checkGameOver(ChessColor.RED)) {
                     // 红方死局
                     game.redScore = 0.0
                     game.blackScore = WIN
                     return
                 } else {
-                    if(game.recorder.steps.isNotEmpty()) {
+                    if (game.recorder.steps.isNotEmpty()) {
                         game.blackScore += game.recorder.lastStep().eatScore
                     }
                 }
